@@ -58,3 +58,5 @@ end
 
 gem "graphql", "~> 2.3", ">= 2.3.14"
 gem "graphiql-rails", group: :development
+
+gem "devise", "~> 4.9", ">= 4.9.4"
