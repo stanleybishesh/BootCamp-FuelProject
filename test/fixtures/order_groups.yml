@@ -1,0 +1,13 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  tenant_id: 1
+  start_on: 2024-08-31
+  completed_on: 2024-08-31 05:44:05
+  status: 1
+
+two:
+  tenant_id: 1
+  start_on: 2024-08-31
+  completed_on: 2024-08-31 05:44:05
+  status: 1
