@@ -1,7 +1,7 @@
 module Mutations
   module Users
-    class CreateUser < BaseMutation
-      argument :user_data, Types::InputObjects::UserCreateInputType, required: true
+    class UserSignUp < BaseMutation
+      argument :user_data, Types::InputObjects::UserSignupInputType, required: true
 
       field :user, Types::Users::UserType, null: true
       field :errors, [ String ], null: false
