@@ -1,5 +1,6 @@
 class Merchandise < ApplicationRecord
   belongs_to :tenant
+  has_many :line_items
 
   enum status: {
     available: 0,
