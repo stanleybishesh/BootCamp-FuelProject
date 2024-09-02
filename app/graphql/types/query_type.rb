@@ -22,5 +22,6 @@ module Types
     # They will be entry points for queries on your schema.
 
     field :user_login, resolver: Resolvers::Users::UserLogin
+    field :fetch_tenant, resolver: Resolvers::Tenants::TenantResolver
   end
 end
