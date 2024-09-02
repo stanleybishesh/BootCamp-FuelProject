@@ -7,8 +7,9 @@ module Resolvers
       # field :errors, [ String ], null: false
 
       def resolve(login_data:)
+        tenant = Tenant.find_by(id: login_data.tenant_id)
         login_attr = login_data.to_h
-        user = User.find_by(email: login_attr[:email])
+        user = tenant.users.find_by(email: login_attr[:email])
 
         if user && user.valid_password?(login_data[:password])
           {

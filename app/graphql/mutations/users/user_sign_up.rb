@@ -7,7 +7,11 @@ module Mutations
       field :errors, [ String ], null: false
 
       def resolve (user_data:)
-        user = User.new(user_data.to_h)
+        tenant = Tenant.find_by(id: user_data.tenant_id)
+        raise GraphQL::ExecutionError, "Tenant does not exist !" if tenant.nil?
+
+        user = tenant.users.new(user_data.to_h)
+
 
         if user.save
           {
