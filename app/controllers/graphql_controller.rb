@@ -54,6 +54,12 @@ class GraphqlController < ApplicationController
     return unless token
 
     decoded_token = JWT.decode(token, "secret", true, algorithm: "HS256")
-    User.find(decoded_token[0]["user_id"])
+    user = User.find(decoded_token[0]["user_id"])
+
+    if user.jti == decoded_token[0]["jti"]
+      user
+    else
+      nil
+    end
   end
 end

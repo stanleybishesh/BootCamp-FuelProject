@@ -13,6 +13,7 @@ module Types
       field :updated_at, GraphQL::Types::ISO8601DateTime, null: false
       field :name, String
       field :tenant_id, Integer, null: true
+      field :jti, String, null: true
     end
   end
 end
