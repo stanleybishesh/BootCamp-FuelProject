@@ -5,7 +5,7 @@ module Mutations
       field :message, String, null: true
 
       def resolve
-        user = context[:current_user]
+        user = current_user
         if user
           new_jti = SecureRandom.uuid
           user.update(jti: new_jti) # Invalidate the JTI
