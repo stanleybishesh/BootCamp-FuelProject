@@ -11,8 +11,9 @@ class GraphqlController < ApplicationController
     query = params[:query]
     operation_name = params[:operationName]
     context = {
-      current_user: current_user_from_token
-      }
+      current_user: current_user_from_token,
+      current_tenant: ActsAsTenant.current_tenant
+    }
     result = FuelPandaSchema.execute(query, variables: variables, context: context, operation_name: operation_name)
     render json: result
   rescue StandardError => e
