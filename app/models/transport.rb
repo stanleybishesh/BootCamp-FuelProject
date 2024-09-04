@@ -1,5 +1,5 @@
 class Transport < ApplicationRecord
-  belongs_to :tenant
+  # belongs_to :tenant
   has_many :line_items
 
   enum status: {
@@ -8,4 +8,6 @@ class Transport < ApplicationRecord
     maintenance: 2,
     out_of_service: 3
   }
+
+  acts_as_tenant(:tenant)
 end

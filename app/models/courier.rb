@@ -4,5 +4,7 @@ class Courier < ApplicationRecord
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable
 
-  belongs_to :tenant
+  # belongs_to :tenant
+
+  acts_as_tenant(:tenant)
 end
