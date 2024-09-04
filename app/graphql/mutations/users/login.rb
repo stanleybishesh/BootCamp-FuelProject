@@ -7,8 +7,7 @@ module Mutations
       field :user, Types::Users::UserType, null: true
 
       def resolve(login_data:)
-        tenant = Tenant.find(login_data.tenant_id)
-        user = tenant.users.find_by(email: login_data.email)
+        user = User.find_by(email: login_data.email)
 
         if user&.valid_password?(login_data.password)
           jti = SecureRandom.uuid
