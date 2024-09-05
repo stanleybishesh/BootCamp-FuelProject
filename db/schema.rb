@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_09_01_180455) do
+ActiveRecord::Schema[7.2].define(version: 2024_09_05_054038) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -58,12 +58,20 @@ ActiveRecord::Schema[7.2].define(version: 2024_09_01_180455) do
     t.index ["transport_id"], name: "index_line_items_on_transport_id"
   end
 
+  create_table "memberships", force: :cascade do |t|
+    t.integer "tenant_id"
+    t.integer "client_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["client_id"], name: "index_memberships_on_client_id"
+    t.index ["tenant_id"], name: "index_memberships_on_tenant_id"
+  end
+
   create_table "merchandises", force: :cascade do |t|
     t.string "name"
-    t.integer "status"
-    t.string "category"
+    t.string "status"
     t.text "description"
-    t.decimal "price"
+    t.float "price"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "tenant_id"
@@ -88,12 +96,11 @@ ActiveRecord::Schema[7.2].define(version: 2024_09_01_180455) do
 
   create_table "transports", force: :cascade do |t|
     t.string "name"
-    t.integer "status"
-    t.string "type"
-    t.string "category"
+    t.string "vehicle_type"
     t.integer "tenant_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "status"
     t.index ["tenant_id"], name: "index_transports_on_tenant_id"
   end
 

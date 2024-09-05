@@ -3,10 +3,10 @@ class Transport < ApplicationRecord
   has_many :line_items
 
   enum status: {
-    available: 0,
-    in_use: 1,
-    maintenance: 2,
-    out_of_service: 3
+    available: "available",
+    in_use: "in_use",
+    maintenance: "maintenance",
+    out_of_service: "out_of_service"
   }
 
   # enum category: {

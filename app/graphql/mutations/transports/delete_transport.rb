@@ -7,7 +7,7 @@ module Mutations
 
       # field :transport, Types::Transports::TransportType, null: false
       field :errors, [ String ], null: true
-      field :message, String, null: true
+      field :message, String, null: false
 
 
       def resolve(id:)
