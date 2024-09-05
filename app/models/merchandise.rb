@@ -2,8 +2,5 @@ class Merchandise < ApplicationRecord
   belongs_to :tenant
   has_many :line_items
 
-  enum status: {
-    available: 0,
-    out_of_stock: 1
-  }
+    enum status: { active: "active", inactive: "inactive", pending: "pending" }
 end
