@@ -7,11 +7,13 @@ module Mutations
       def resolve
         user = current_user
         if user
-          new_jti = SecureRandom.uuid
-          user.update(jti: new_jti) # Invalidate the JTI
-          { success: true, message: "Logged Out Successfully !" }
+          ActsAsTenant.with_tenant(user.tenant) do
+            new_jti = SecureRandom.uuid
+            user.update(jti: new_jti) # Invalidate the JTI
+            { success: true, message: "Logged Out Successfully !" }
+          end
         else
-          raise GraphQL::ExecutionError, "User not logged in"
+            raise GraphQL::ExecutionError, "User not logged in"
         end
       end
     end

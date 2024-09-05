@@ -4,5 +4,5 @@ class Tenant < ApplicationRecord
   has_many :users
   has_many :couriers
   has_many :memberships
-  has_many :clients, through: :membership
+  has_many :clients, through: :memberships
 end
