@@ -21,11 +21,9 @@ module Types
     # Add root-level fields here.
     # They will be entry points for queries on your schema.
 
-    # TODO: remove me
-    field :test_field, String, null: false,
-      description: "An example field added by the generator"
-    def test_field
-      "Hello World!"
-    end
+    field :user_login, resolver: Resolvers::Users::UserLogin
+    field :fetch_tenant, resolver: Resolvers::Tenants::TenantResolver
+    field :get_all_clients, resolver: Resolvers::Clients::GetAllClients
+    field :get_client_by_id, resolver: Resolvers::Clients::GetClientById
   end
 end

@@ -7,5 +7,7 @@ class OrderGroup < ApplicationRecord
   }
 
   has_one :delivery_order
-  belongs_to :tenant
+  # belongs_to :tenant
+
+  acts_as_tenant(:tenant)
 end

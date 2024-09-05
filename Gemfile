@@ -60,3 +60,9 @@ gem "graphql", "~> 2.3", ">= 2.3.14"
 gem "graphiql-rails", group: :development
 
 gem "devise", "~> 4.9", ">= 4.9.4"
+gem 'devise-jwt', '~> 0.12.1'
+gem "jsonapi-serializer"
+# gem 'jwt', '~> 1.5', '>= 1.5.4'
+gem "bcrypt", "~> 3.1.20"
+gem "rack-cors"
+gem 'acts_as_tenant', '~> 1.0', '>= 1.0.1'
