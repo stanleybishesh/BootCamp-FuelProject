@@ -8,5 +8,8 @@ module Types
     field :create_client, mutation: Mutations::Clients::CreateClient
     field :edit_client, mutation: Mutations::Clients::EditClient
     field :delete_client, mutation: Mutations::Clients::DeleteClient
+    field :create_merchandise, mutation: Mutations::Merchandises::CreateMerchandise
+    field :delete_merchandise, mutation: Mutations::Merchandises::DeleteMerchandise
+    field :update_merchandise, mutation: Mutations::Merchandises::UpdateMerchandise
   end
 end
