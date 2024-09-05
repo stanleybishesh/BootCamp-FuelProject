@@ -3,7 +3,7 @@ module Types
     class MakeTransportInputType < BaseInputObject
       argument :name, String, required: true
       argument :status, Types::Transports::StatusType, required: true
-      argument :tenant_id, ID, required: true
+      # argument :tenant_id, ID, required: true
       argument :vehicle_type, Types::Transports::VehicleType, required: true
     end
   end

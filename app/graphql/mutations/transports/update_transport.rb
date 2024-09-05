@@ -1,33 +1,35 @@
 module Mutations
   module Transports
-    class CreateTransport < BaseMutation
+    class UpdateTransport < BaseMutation
+      argument :id, ID, required: true
       argument :transport_info, Types::InputObjects::MakeTransportInputType, required: true
 
       field :transport, Types::Transports::TransportType, null: true
       field :errors, [ String ], null: false
       field :message, String, null: false
 
-      def resolve(transport_info:)
+      def resolve(id:, transport_info:)
         user = current_user
         if user
           ActsAsTenant.with_tenant(user.tenant) do
-            transport_attr = transport_info.to_h
+            transport = Transport.find_by(id: id)
 
-            transport = Transport.new(transport_attr)
+            if transport.nil?
+              raise GraphQL::ExecutionError, "Transport not found"
+            end
 
-            if transport.save
+            if transport.update(transport_info.to_h)
               {
                 transport: transport,
                 errors: [],
-                message: "Transport created Successfully"
+                message: "Transport updated successfully"
               }
             else
               {
                 transport: nil,
-                errors: transport.errors.full_message,
-                message: []
+                errors: transport.errors.full_messages,
+                message: "Transport could not be updated"
               }
-
             end
           end
         else

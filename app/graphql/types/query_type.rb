@@ -25,5 +25,7 @@ module Types
     field :fetch_tenant, resolver: Resolvers::Tenants::TenantResolver
     field :get_all_clients, resolver: Resolvers::Clients::GetAllClients
     field :get_client_by_id, resolver: Resolvers::Clients::GetClientById
+    field :get_all_transport, resolver: Resolvers::Transports::TransportResolver
+    field :get_all_transport_by_vehicle_type, resolver: Resolvers::Transports::TransportVehicleTypeResolver
   end
 end

@@ -10,5 +10,6 @@ module Types
     field :delete_client, mutation: Mutations::Clients::DeleteClient
     field :create_transport, mutation: Mutations::Transports::CreateTransport
     field :delete_transport, mutation: Mutations::Transports::DeleteTransport
+    field :update_transport, mutation: Mutations::Transports::UpdateTransport
   end
 end

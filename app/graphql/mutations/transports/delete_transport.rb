@@ -1,7 +1,7 @@
 module Mutations
   module Transports
     class DeleteTransport < BaseMutation
-      argument :id, ID, required: true
+      argument :transport_id, ID, required: true
       # argument :tenant_id, ID, required: true
 
 
@@ -10,27 +10,26 @@ module Mutations
       field :message, String, null: false
 
 
-      def resolve(id:)
-        # tenant = Tenant.find_by(id: tenant_id)
-        transport = Transport.find_by(id: id)
-
-         if transport.nil?
-          return {
-            message: "Failed to delete transport",
-            errors: [ "Transport not found" ]
-          }
-         end
-
-        if transport.destroy
-          {
-            Message: "Transport deleted",
-            errors: []
-          }
+      def resolve(transport_id:)
+        user = current_user
+        if user
+          ActsAsTenant.with_tenant(user.tenant) do
+          transport = Transport.find(transport_id)
+            if transport
+              transport.destroy
+              {
+                message: "Transport deleted",
+                errors: []
+              }
+            else
+              {
+                message: "Failed to delete Transport",
+                errors: [ "Transport not found or could not be deleted" ]
+              }
+            end
+          end
         else
-          {
-            message: "Failed to delete Transport",
-            errors: [ "Transport not found or couldnot be deleted" ]
-          }
+          raise GraphQL::ExecutionError, "Transport not found"
         end
       end
     end
