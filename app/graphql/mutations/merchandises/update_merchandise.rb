@@ -6,23 +6,23 @@ module Mutations
 
       field :merchandise, Types::Merchandises::MerchandiseType, null: false
       field :errors, [ String ], null: false
+      field :message, String, null: true
 
       def resolve(id:, merchandise_info:)
         merchandise_attr = merchandise_info.to_h
-        tenant = Tenant.find_by(id: merchandise_info.tenant_id)
-        raise GraphQL::ExecutionError, "Tenant does not exist !" if tenant.nil?
+        merchandise = Merchandise.find(id)
 
-        merchandise = tenant.merchandises.new(merchandise_attr)
-
-        if merchandise.update!(merchandise_attr)
+        if merchandise.update(merchandise_attr)
           {
             merchandise: merchandise,
-            errors: []
+            errors: [],
+            message: "Merchandise updated successfully"
           }
         else
           {
             merchandise: nil,
-            errors: [ err.message ]
+            errors: [ err.message ],
+            message: "Unable to edit merchandise"
           }
         end
       end

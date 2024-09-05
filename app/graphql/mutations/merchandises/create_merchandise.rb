@@ -5,25 +5,27 @@ module Mutations
 
       field :merchandise, Types::Merchandises::MerchandiseType, null: false
       field :errors, [ String ], null: false
+      field :message, String, null: true
 
       def resolve(merchandise_info:)
-        # merchandise_attr = merchandise_info.to_h
-        tenant = Tenant.find_by(id: merchandise_info.tenant_id)
-        raise GraphQL::ExecutionError, "Tenant does not exist !" if tenant.nil?
-
-        # formatted_price = merchandise_info[:price].to_i
-        merchandise = tenant.merchandises.new(merchandise_info.to_h)
-
-        if merchandise.save
-          {
-            merchandise: merchandise,
-            errors: []
-          }
-        else
-          {
-            merchandise: nil,
-            errors: merchandise.errors.full_messages
-          }
+        user = current_user
+        if user
+          ActsAsTenant.with_tenant(user.tenant) do
+            merchandise = Merchandise.new(merchandise_info.to_h)
+            if merchandise.save
+              {
+                merchandise: merchandise,
+                errors: [],
+                message: "Merchandise created successfully"
+              }
+            else
+              {
+                merchandise: nil,
+                errors: merchandise.errors.full_messages,
+                message: "Unable to create #{merchandise_info.name}"
+              }
+            end
+          end
         end
       end
     end
