@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_09_06_053522) do
+ActiveRecord::Schema[7.2].define(version: 2024_09_06_074632) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -72,6 +72,8 @@ ActiveRecord::Schema[7.2].define(version: 2024_09_06_053522) do
     t.string "description"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "tenant_id"
+    t.index ["tenant_id"], name: "index_merchandise_categories_on_tenant_id"
   end
 
   create_table "merchandises", force: :cascade do |t|
@@ -81,10 +83,8 @@ ActiveRecord::Schema[7.2].define(version: 2024_09_06_053522) do
     t.float "price"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.integer "tenant_id"
     t.integer "merchandise_category_id"
     t.index ["merchandise_category_id"], name: "index_merchandises_on_merchandise_category_id"
-    t.index ["tenant_id"], name: "index_merchandises_on_tenant_id"
   end
 
   create_table "order_groups", force: :cascade do |t|

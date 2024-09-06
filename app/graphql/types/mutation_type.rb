@@ -11,5 +11,8 @@ module Types
     field :create_merchandise, mutation: Mutations::Merchandises::CreateMerchandise
     field :delete_merchandise, mutation: Mutations::Merchandises::DeleteMerchandise
     field :update_merchandise, mutation: Mutations::Merchandises::UpdateMerchandise
+    field :create_merchandise_category, mutation: Mutations::MerchandiseCategories::CreateMerchandiseCategory
+    field :edit_merchandise_category, mutation: Mutations::MerchandiseCategories::EditMerchandiseCategory
+    field :delete_merchandise_category, mutation: Mutations::MerchandiseCategories::DeleteMerchandiseCategory
   end
 end
