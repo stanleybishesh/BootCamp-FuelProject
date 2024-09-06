@@ -5,6 +5,7 @@ module Types
       argument :status, Types::Merchandises::StatusType, required: true
       argument :description, String, required: false
       argument :price, Float, required: true
+      argument :unit, String, required: true
     end
   end
 end
