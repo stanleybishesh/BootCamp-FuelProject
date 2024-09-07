@@ -1,6 +1,6 @@
 module Types
   module Transports
-    class StatusType < Types::BaseEnum
+    class TransportStatusType < Types::BaseEnum
       value "available", value: "available"
       value "in_use", value: "in_use"
       value "maintenance", value: "maintenance"
