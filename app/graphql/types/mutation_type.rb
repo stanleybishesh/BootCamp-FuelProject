@@ -11,5 +11,7 @@ module Types
     field :create_transport, mutation: Mutations::Transports::CreateTransport
     field :delete_transport, mutation: Mutations::Transports::DeleteTransport
     field :update_transport, mutation: Mutations::Transports::UpdateTransport
+    field :courier_signin, mutation: Mutations::Couriers::CourierSignin
+    field :courier_signout, mutation: Mutations::Couriers::CourierSignout
   end
 end

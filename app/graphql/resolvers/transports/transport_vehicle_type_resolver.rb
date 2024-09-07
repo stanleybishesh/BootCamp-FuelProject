@@ -5,6 +5,7 @@ module Resolvers
 
       argument :vehicle_type, String, required: true
 
+
       def resolve(vehicle_type:)
         Transport.where(vehicle_type: vehicle_type)
       end

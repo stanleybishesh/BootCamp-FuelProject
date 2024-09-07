@@ -7,8 +7,12 @@ module Mutations
     input_object_class Types::BaseInputObject
     object_class Types::BaseObject
 
-    def current_user
-      context[:current_user]
-    end
+    # def current_user
+    #   context[:current_user]
+    # end
+
+    # def current_courier
+    #   context[:current_courier]
+    # end
   end
 end

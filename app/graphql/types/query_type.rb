@@ -27,5 +27,6 @@ module Types
     field :get_client_by_id, resolver: Resolvers::Clients::GetClientById
     field :get_all_transport, resolver: Resolvers::Transports::TransportResolver
     field :get_all_transport_by_vehicle_type, resolver: Resolvers::Transports::TransportVehicleTypeResolver
+    field :get_all_courier, resolver: Resolvers::Couriers::CourierResolver
   end
 end
