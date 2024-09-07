@@ -3,7 +3,7 @@ module Resolvers
     class TransportVehicleTypeResolver < BaseResolver
       type [ Types::Transports::TransportType ], null: false
 
-      argument :vehicle_type, String, required: true
+      argument :vehicle_type, Types::Transports::VehicleType, required: true
 
       def resolve(vehicle_type:)
         user = current_user
