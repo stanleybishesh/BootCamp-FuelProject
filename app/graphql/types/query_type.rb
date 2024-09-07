@@ -29,5 +29,7 @@ module Types
     field :get_merchandise_category_by_id, resolver: Resolvers::MerchandiseCategories::GetMerchandiseCategoryById
     field :get_all_merchandises, resolver: Resolvers::Merchandises::GetAllMerchandises
     field :get_merchandise_by_category, resolver: Resolvers::Merchandises::GetMerchandiseByCategory
+    field :get_all_transport, resolver: Resolvers::Transports::TransportResolver
+    field :get_all_transport_by_vehicle_type, resolver: Resolvers::Transports::TransportVehicleTypeResolver
   end
 end
