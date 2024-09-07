@@ -4,7 +4,14 @@ module Resolvers
       type [ Types::Transports::TransportType ], null: false
 
       def resolve
-        Transport.all
+        user = current_user
+        if user
+          ActsAsTenant.with_tenant(user.tenant) do
+            Transport.all
+          end
+        else
+          raise GraphQL::ExecutionError, "User not logged in"
+        end
       end
     end
   end

@@ -24,7 +24,7 @@ module Mutations
             else
               {
                 transport: nil,
-                errors: transport.errors.full_message,
+                errors: [ transport.errors.full_message ],
                 message: []
               }
 

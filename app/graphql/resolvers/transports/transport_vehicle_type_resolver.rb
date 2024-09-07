@@ -6,7 +6,14 @@ module Resolvers
       argument :vehicle_type, String, required: true
 
       def resolve(vehicle_type:)
-        Transport.where(vehicle_type: vehicle_type)
+        user = current_user
+        if user
+          ActsAsTenant.with_tenant(user.tenant) do
+            Transport.where(vehicle_type: vehicle_type)
+          end
+        else
+          raise GraphQL::ExecutionError, "User not logged in"
+        end
       end
     end
   end
