@@ -25,5 +25,9 @@ module Types
     field :fetch_tenant, resolver: Resolvers::Tenants::TenantResolver
     field :get_all_clients, resolver: Resolvers::Clients::GetAllClients
     field :get_client_by_id, resolver: Resolvers::Clients::GetClientById
+    field :get_all_merchandise_categories, resolver: Resolvers::MerchandiseCategories::GetAllMerchandiseCategories
+    field :get_merchandise_category_by_id, resolver: Resolvers::MerchandiseCategories::GetMerchandiseCategoryById
+    field :get_all_merchandises, resolver: Resolvers::Merchandises::GetAllMerchandises
+    field :get_merchandise_by_category, resolver: Resolvers::Merchandises::GetMerchandiseByCategory
   end
 end

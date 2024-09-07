@@ -1,11 +1,6 @@
 class Merchandise < ApplicationRecord
   # belongs_to :tenant
-  has_many :line_items
+  enum status: { available: "available", out_of_stock: "out_of_stock" }
 
-  enum status: {
-    available: 0,
-    out_of_stock: 1
-  }
-
-  acts_as_tenant(:tenant)
+  belongs_to :merchandise_category
 end
