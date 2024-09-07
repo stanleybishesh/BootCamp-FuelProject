@@ -14,5 +14,8 @@ module Types
     field :create_merchandise_category, mutation: Mutations::MerchandiseCategories::CreateMerchandiseCategory
     field :edit_merchandise_category, mutation: Mutations::MerchandiseCategories::EditMerchandiseCategory
     field :delete_merchandise_category, mutation: Mutations::MerchandiseCategories::DeleteMerchandiseCategory
+    field :create_transport, mutation: Mutations::Transports::CreateTransport
+    field :delete_transport, mutation: Mutations::Transports::DeleteTransport
+    field :update_transport, mutation: Mutations::Transports::UpdateTransport
   end
 end
