@@ -7,3 +7,10 @@
 #   ["Action", "Comedy", "Drama", "Horror"].each do |genre_name|
 #     MovieGenre.find_or_create_by!(name: genre_name)
 #   end
+Venue.create(name: "New York City, NY")
+Venue.create(name: "Los Angeles, CA")
+Venue.create(name: "Chicago, IL")
+Venue.create(name: "Atlanta, GA")
+Venue.create(name: "Dallas, TX")
+Venue.create(name: "Miami, FL")
+Venue.create(name: "Seattle, WA")
