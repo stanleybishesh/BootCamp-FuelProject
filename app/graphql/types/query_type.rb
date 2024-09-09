@@ -31,6 +31,6 @@ module Types
     field :get_merchandise_by_category, resolver: Resolvers::Merchandises::GetMerchandiseByCategory
     field :get_all_transport, resolver: Resolvers::Transports::TransportResolver
     field :get_all_transport_by_vehicle_type, resolver: Resolvers::Transports::TransportVehicleTypeResolver
-    field :get_all_venues, resolver: Resolvers::Venues::GetAllVenues
+    field :get_venues_by_client_id, resolver: Resolvers::Venues::GetVenuesByClientId
   end
 end

@@ -17,5 +17,8 @@ module Types
     field :create_transport, mutation: Mutations::Transports::CreateTransport
     field :delete_transport, mutation: Mutations::Transports::DeleteTransport
     field :update_transport, mutation: Mutations::Transports::UpdateTransport
+    field :create_venue, mutation: Mutations::Venues::CreateVenue
+    field :edit_venue, mutation: Mutations::Venues::EditVenue
+    field :delete_venue, mutation: Mutations::Venues::DeleteVenue
   end
 end
