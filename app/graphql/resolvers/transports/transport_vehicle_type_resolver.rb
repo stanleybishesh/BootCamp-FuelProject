@@ -5,6 +5,7 @@ module Resolvers
 
       argument :vehicle_type, Types::Transports::VehicleType, required: true
 
+
       def resolve(vehicle_type:)
         user = current_user
         if user

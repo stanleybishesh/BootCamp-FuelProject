@@ -8,6 +8,12 @@ class Transport < ApplicationRecord
     maintenance: "maintenance",
     out_of_service: "out_of_service"
   }
+  enum vehicle_type: {
+    tank: "tank",
+    tank_wagon: "tank_wagon",
+    truck: "truck",
+    semi_truck: "semi_truck"
+  }
 
   enum vehicle_type: {
     tank: "tank",
