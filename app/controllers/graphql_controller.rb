@@ -5,14 +5,23 @@ class GraphqlController < ApplicationController
   # This allows for outside API access while preventing CSRF attacks,
   # but you'll have to authenticate your user separately
   # protect_from_forgery with: :null_session
-
+  include TokenHelper
   def execute
     variables = prepare_variables(params[:variables])
     query = params[:query]
     operation_name = params[:operationName]
+
+    current_entity = current_entity_from_token
+    current_tenant = ActsAsTenant.current_tenant
+
     context = {
-      current_user: current_user_from_token,
-      current_tenant: ActsAsTenant.current_tenant
+      current_user: current_entity.is_a?(User) ? current_entity : nil,
+      current_courier: current_entity.is_a?(Courier) ? current_entity : nil,
+      current_tenant: current_tenant,
+      headers: request.headers
+
+      # current_user: current_user_from_token,
+      # current_courier: current_courier_from_token
     }
     result = FuelPandaSchema.execute(query, variables: variables, context: context, operation_name: operation_name)
     render json: result
@@ -48,19 +57,5 @@ class GraphqlController < ApplicationController
     logger.error e.backtrace.join("\n")
 
     render json: { errors: [ { message: e.message, backtrace: e.backtrace } ], data: {} }, status: 500
-  end
-
-  def current_user_from_token
-    token = request.headers["Authorization"].to_s.split(" ").last
-    return unless token
-
-    decoded_token = JWT.decode(token, "secret", true, algorithm: "HS256")
-    user = User.find(decoded_token[0]["user_id"])
-
-    if user.jti == decoded_token[0]["jti"]
-      user
-    else
-      nil
-    end
   end
 end

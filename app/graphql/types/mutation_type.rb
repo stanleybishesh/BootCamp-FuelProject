@@ -20,5 +20,7 @@ module Types
     field :create_venue, mutation: Mutations::Venues::CreateVenue
     field :edit_venue, mutation: Mutations::Venues::EditVenue
     field :delete_venue, mutation: Mutations::Venues::DeleteVenue
+    field :courier_signin, mutation: Mutations::Couriers::CourierSignin
+    field :courier_signout, mutation: Mutations::Couriers::CourierSignout
   end
 end
