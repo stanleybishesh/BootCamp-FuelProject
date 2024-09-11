@@ -76,6 +76,9 @@ module Clients
       rescue ActiveRecord::RecordNotSaved, ActiveRecord::RecordNotFound => err
         @success = false
         @errors << err.message
+      rescue StandardError => err
+        @success = false
+        @errors << "An unexpected error occurred: #{err.message}"
       end
     end
 
@@ -110,6 +113,93 @@ module Clients
       rescue ActiveRecord::RecordNotSaved, ActiveRecord::RecordNotFound => err
         @success = false
         @errors << err.message
+      rescue StandardError => err
+        @success = false
+        @errors << "An unexpected error occurred: #{err.message}"
+      end
+    end
+
+    def handle_delete_client
+      begin
+        user = current_user
+        if user
+          ActsAsTenant.with_tenant(user.tenant) do
+            membership = Membership.find_by(client_id: params[:client_id])
+            @client = Client.find(membership.client_id)
+            if @client
+              if @client.destroy && membership.destroy
+                @success = true
+                @errors = []
+              else
+                raise ActiveRecord::RecordNotDestroyed, "Client could not be deleted"
+                @success = false
+                @errors = [ @client.errors.full_messages ]
+              end
+            else
+              raise ActiveRecord::RecordNotFound, "Client not found in this tenant"
+              @success = false
+              @errors = [ @client.errors.full_messages ]
+            end
+          end
+        else
+          raise ActiveRecord::RecordNotFound, "User not logged in"
+          @success = false
+          @errors = [ @client.errors.full_messages ]
+        end
+      rescue ActiveRecord::RecordNotDestroyed, ActiveRecord::RecordNotFound => err
+        @success = false
+        @errors << err.message
+      rescue StandardError => err
+        @success = false
+        @errors << "An unexpected error occurred: #{err.message}"
+      end
+    end
+
+    def handle_get_all_clients
+      begin
+        user = current_user
+        if user
+          ActsAsTenant.with_tenant(user.tenant) do
+            memberships = Membership.all
+            @clients = Client.where(id: memberships.select(:client_id))
+            @success = true
+            @errors = []
+          end
+        else
+          raise ActiveRecord::RecordNotFound, "User not logged in"
+          @success = false
+          @errors = [ @clients.errors.full_messages ]
+        end
+      rescue ActiveRecord::RecordNotFound => err
+        @success = false
+        @errors << err.message
+      rescue StandardError => err
+        @success = false
+        @errors << "An unexpected error occurred: #{err.message}"
+      end
+    end
+
+    def handle_get_client_by_id
+      begin
+        user = current_user
+        if user
+          ActsAsTenant.with_tenant(user.tenant) do
+            membership = Membership.find_by(client_id: params[:client_id])
+            @client = Client.find(membership.client_id)
+            @success = true
+            @errors = []
+          end
+        else
+          raise ActiveRecord::RecordNotFound, "User not logged in"
+          @success = false
+          @errors = [ @client.errors.full_messages ]
+        end
+      rescue ActiveRecord::RecordNotFound => err
+        @success = false
+        @errors << err.message
+      rescue StandardError => err
+        @success = false
+        @errors << "An unexpected error occurred: #{err.message}"
       end
     end
 

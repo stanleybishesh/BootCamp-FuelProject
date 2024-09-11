@@ -7,7 +7,7 @@ class Mutations::Clients::EditClient < Mutations::BaseMutation
 
   def resolve(client_id:, client_info:)
     begin
-      client_service = ::Clients::ClientService.new(client_info.to_h.merge(current_user: current_user, cliend_id: client_id)).execute_edit_client
+      client_service = ::Clients::ClientService.new(client_info.to_h.merge(current_user: current_user, client_id: client_id)).execute_edit_client
       if client_service.success?
         {
           client: client_service.client,
