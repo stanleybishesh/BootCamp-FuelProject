@@ -5,25 +5,31 @@ module Mutations
 
       field :token, String, null: false
       field :user, Types::Users::UserType, null: true
-      field :message, String, null: true
+      field :errors, [ String ], null: true
 
       def resolve(login_data:)
-        user = User.find_by(email: login_data.email)
-        if user
-          ActsAsTenant.with_tenant(user.tenant) do
-            if user&.valid_password?(login_data.password)
-              jti = SecureRandom.uuid
-              token = ::JWT.encode({ user_id: user.id, jti: jti, exp: 1.day.from_now.to_i, type: "user" }, "secret", "HS256")
-
-              # Optionally, store the JTI in the database or a cache with an expiration time
-              user.update(jti: jti)
-              { token: token, user: user, message: "Logged In Successfully" }
-            else
-              raise GraphQL::ExecutionError, "Invalid email or password"
-            end
+        begin
+          user_service = ::Users::UserService.new(login_data.to_h).execute_user_login
+          if user_service.success?
+            {
+              token: user_service.token,
+              user: user_service.user,
+              errors: []
+            }
+          else
+            raise GraphQL::ExecutionError, "Login Failed"
+            {
+              token: nil,
+              user: nil,
+              errors: [ user_service.errors ]
+            }
           end
-        else
-          raise GraphQL::ExecutionError, "User not registered"
+        rescue GraphQL::ExecutionError => err
+          {
+            token: nil,
+            user: nil,
+            errors: [ err.message ]
+          }
         end
       end
     end
