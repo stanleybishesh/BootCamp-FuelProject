@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_09_09_070443) do
+ActiveRecord::Schema[7.2].define(version: 2024_09_11_112148) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -18,6 +18,9 @@ ActiveRecord::Schema[7.2].define(version: 2024_09_09_070443) do
     t.string "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "email"
+    t.string "address"
+    t.string "phone"
   end
 
   create_table "couriers", force: :cascade do |t|
@@ -41,23 +44,24 @@ ActiveRecord::Schema[7.2].define(version: 2024_09_09_070443) do
   create_table "delivery_orders", force: :cascade do |t|
     t.integer "order_group_id"
     t.string "source"
-    t.datetime "planned_at"
-    t.datetime "completed_at"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.string "vehicle_type"
+    t.integer "transport_id"
+    t.integer "courier_id"
+    t.index ["courier_id"], name: "index_delivery_orders_on_courier_id"
     t.index ["order_group_id"], name: "index_delivery_orders_on_order_group_id"
+    t.index ["transport_id"], name: "index_delivery_orders_on_transport_id"
   end
 
   create_table "line_items", force: :cascade do |t|
     t.integer "quantity"
     t.integer "delivery_order_id"
     t.integer "merchandise_id"
-    t.integer "transport_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.integer "merchandise_category_id"
+    t.float "price"
+    t.string "unit"
     t.index ["delivery_order_id"], name: "index_line_items_on_delivery_order_id"
+    t.index ["merchandise_category_id"], name: "index_line_items_on_merchandise_category_id"
     t.index ["merchandise_id"], name: "index_line_items_on_merchandise_id"
-    t.index ["transport_id"], name: "index_line_items_on_transport_id"
   end
 
   create_table "memberships", force: :cascade do |t|
@@ -92,12 +96,14 @@ ActiveRecord::Schema[7.2].define(version: 2024_09_09_070443) do
 
   create_table "order_groups", force: :cascade do |t|
     t.integer "tenant_id"
+    t.integer "client_id"
+    t.integer "venue_id"
     t.date "start_on"
     t.datetime "completed_on"
-    t.integer "status"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.string "status"
+    t.index ["client_id"], name: "index_order_groups_on_client_id"
     t.index ["tenant_id"], name: "index_order_groups_on_tenant_id"
+    t.index ["venue_id"], name: "index_order_groups_on_venue_id"
   end
 
   create_table "tenants", force: :cascade do |t|
