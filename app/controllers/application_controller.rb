@@ -8,4 +8,12 @@ class ApplicationController < ActionController::API
   #   current_tenant = Tenant.find_it
   #   set_current_tenant(current_tenant)
   # end
+  # around_action :set_current_user
+
+  # def set_current_user
+  #   RequestStore.store[:current_user] = current_user
+  #   yield
+  # ensure
+  #   RequestStore.store[:current_user] = nil
+  # end
 end

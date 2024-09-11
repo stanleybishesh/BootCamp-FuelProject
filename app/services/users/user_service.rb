@@ -43,13 +43,15 @@ module Users
               @success = true
               @errors = []
             else
-              @success = false
-              @errors = [ user.errors.full_messages ]
               raise ActiveRecord::ActiveRecordError, "Invalid email or password"
+              @success = false
+              @errors = [ @user.errors.full_messages ]
             end
           end
         else
           raise ActiveRecord::RecordNotFound, "User not registered"
+          @success = false
+          @errors = [ @user.errors.full_messages ]
         end
       rescue ActiveRecord::ActiveRecordError => err
         @success = false
@@ -64,6 +66,32 @@ module Users
     end
 
     def handle_user_logout
+      begin
+        @user = current_user
+        if @user
+          ActsAsTenant.with_tenant(@user.tenant) do
+            new_jti = SecureRandom.uuid
+            @user.update(jti: new_jti)
+            @success = true
+            @errors=[]
+          end
+        else
+          raise ActiveRecord::RecordNotFound, "User not logged in"
+          @success = false
+          @errors = [ @user.errors.full_messages ]
+        end
+      rescue ActiveRecord::RecordNotFound => err
+        @success = false
+        @errors << err.message
+      rescue StandardError => err
+        @success = false
+        @errors << "An unexpected error occurred: #{err.message}"
+      end
+      debugger
+    end
+
+    def current_user
+      params[:current_user]
     end
 
     def user_params

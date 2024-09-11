@@ -17,7 +17,6 @@ module Mutations
               errors: []
             }
           else
-            raise GraphQL::ExecutionError, "Login Failed"
             {
               token: nil,
               user: nil,
