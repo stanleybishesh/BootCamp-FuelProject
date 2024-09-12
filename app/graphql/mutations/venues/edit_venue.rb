@@ -5,29 +5,30 @@ class Mutations::Venues::EditVenue < Mutations::BaseMutation
 
   field :venue, Types::Venues::VenueType, null: false
   field :message, String, null: true
+  field :errors, [ String ], null: true
 
   def resolve(client_id:, venue_id:, name:)
-    user = current_user
-    if user
-      ActsAsTenant.with_tenant(user.tenant) do
-        membership = Membership.find_by(client_id: client_id)
-        raise GraphQL::ExecutionError, "Client not found in this tenant" if membership.nil?
-        client = Client.find(membership.client_id)
-        venue = client.venues.find(venue_id)
-        if venue.update(name: name)
-          {
-            venue: venue,
-            message: "Venue successfully updated"
-          }
-        else
-          {
-            venue: venue,
-            message: "Venue failed to edit"
-          }
-        end
+    begin
+      venue_service = ::Venues::VenueService.new(client_id: client_id, venue_id: venue_id, name: name, current_user: current_user).execute_edit_venue
+      if venue_service.success?
+        {
+          venue: venue_service.venue,
+          message: "Venue updated successfully",
+          errors: []
+        }
+      else
+        {
+          venue: nil,
+          message: "Venue failed to edit",
+          errors: [ venue_service.errors ]
+        }
       end
-    else
-      raise GraphQL::ExecutionError, "User not logged in"
+    rescue GraphQL::ExecutionError => err
+      {
+        venue: nil,
+        message: "Venue failed to edit",
+        errors: [ err.message ]
+      }
     end
   end
 end

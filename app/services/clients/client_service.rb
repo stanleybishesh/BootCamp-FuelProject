@@ -71,7 +71,7 @@ module Clients
         else
           raise ActiveRecord::RecordNotFound, "User not logged in"
           @success = false
-          @errors = [ @client.errors.full_messages ]
+          @errors << "User not logged in"
         end
       rescue ActiveRecord::RecordNotSaved, ActiveRecord::RecordNotFound => err
         @success = false
@@ -102,13 +102,13 @@ module Clients
             else
               raise ActiveRecord::RecordNotFound, "Client not found"
               @success = false
-              @errors = [ @client.errors.full_messages ]
+              @errors << "Client does not exist in this tenant"
             end
           end
         else
           raise ActiveRecord::RecordNotFound, "User not logged in"
           @success = false
-          @errors = [ @client.errors.full_messages ]
+          @errors << "User not logged in"
         end
       rescue ActiveRecord::RecordNotSaved, ActiveRecord::RecordNotFound => err
         @success = false
@@ -138,13 +138,13 @@ module Clients
             else
               raise ActiveRecord::RecordNotFound, "Client not found in this tenant"
               @success = false
-              @errors = [ @client.errors.full_messages ]
+              @errors << "Client does not exist in this tenant"
             end
           end
         else
           raise ActiveRecord::RecordNotFound, "User not logged in"
           @success = false
-          @errors = [ @client.errors.full_messages ]
+          @errors << "User not logged in"
         end
       rescue ActiveRecord::RecordNotDestroyed, ActiveRecord::RecordNotFound => err
         @success = false
@@ -168,7 +168,7 @@ module Clients
         else
           raise ActiveRecord::RecordNotFound, "User not logged in"
           @success = false
-          @errors = [ @clients.errors.full_messages ]
+          @errors << "User not logged in"
         end
       rescue ActiveRecord::RecordNotFound => err
         @success = false
@@ -192,7 +192,7 @@ module Clients
         else
           raise ActiveRecord::RecordNotFound, "User not logged in"
           @success = false
-          @errors = [ @client.errors.full_messages ]
+          @errors << "User not logged in"
         end
       rescue ActiveRecord::RecordNotFound => err
         @success = false
