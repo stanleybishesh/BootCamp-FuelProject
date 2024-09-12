@@ -67,3 +67,6 @@ gem "bcrypt", "~> 3.1.20"
 gem "rack-cors"
 gem 'acts_as_tenant', '~> 1.0', '>= 1.0.1'
 gem 'request_store', '~> 1.7'
+
+gem 'sidekiq', '~> 7.3', '>= 7.3.2'
+gem 'sidekiq-scheduler', '~> 5.0', '>= 5.0.6'
