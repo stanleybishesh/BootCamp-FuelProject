@@ -51,7 +51,7 @@ module Users
         else
           raise ActiveRecord::RecordNotFound, "User not registered"
           @success = false
-          @errors = [ @user.errors.full_messages ]
+          @errors << "User does not exist"
         end
       rescue ActiveRecord::ActiveRecordError => err
         @success = false
@@ -78,7 +78,7 @@ module Users
         else
           raise ActiveRecord::RecordNotFound, "User not logged in"
           @success = false
-          @errors = [ @user.errors.full_messages ]
+          @errors << "User not logged in"
         end
       rescue ActiveRecord::RecordNotFound => err
         @success = false
@@ -87,7 +87,6 @@ module Users
         @success = false
         @errors << "An unexpected error occurred: #{err.message}"
       end
-      debugger
     end
 
     def current_user
