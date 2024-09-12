@@ -3,17 +3,30 @@ module Mutations
     class Logout < BaseMutation
       field :success, Boolean, null: true
       field :message, String, null: true
+      field :errors, [ String ], null: true
 
       def resolve
-        user = current_user
-        if user
-          ActsAsTenant.with_tenant(user.tenant) do
-            new_jti = SecureRandom.uuid
-            user.update(jti: new_jti)
-            { success: true, message: "Logged Out Successfully!" }
+        begin
+          user_service = ::Users::UserService.new(current_user: current_user).execute_user_logout
+          if user_service.success?
+            {
+              success: user_service.success,
+              message: "Logged out successfully",
+              errors: []
+            }
+          else
+            {
+              success: user_service.success,
+              message: "Log out failed",
+              errors: [ user_service.errors ]
+            }
           end
-        else
-          raise GraphQL::ExecutionError, "User not logged in"
+        rescue GraphQL::ExecutionError => err
+          {
+            success: false,
+            message: "Log out failed",
+            errors: [ err.message ]
+          }
         end
       end
     end

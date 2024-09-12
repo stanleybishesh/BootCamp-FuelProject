@@ -2,27 +2,27 @@ class Mutations::Clients::DeleteClient < Mutations::BaseMutation
   argument :client_id, ID, required: true
 
   field :message, String, null: true
+  field :errors, [ String ], null: true
 
   def resolve(client_id:)
-    user = current_user
-    if user
-      ActsAsTenant.with_tenant(user.tenant) do
-        membership = Membership.find_by(client_id: client_id)
-        client = Client.find(membership.client_id)
-        if client
-          if client.destroy && membership.destroy
-            {
-              message: "Client Deleted Successfully"
-            }
-          else
-            raise GraphQL::ExecutionError, "Client could not be deleted"
-          end
-        else
-          raise GraphQL::ExecutionError, "Client not found in this tenant"
-        end
+    begin
+      client_service = ::Clients::ClientService.new(current_user: current_user, client_id: client_id).execute_delete_client
+      if client_service.success?
+        {
+          message: "Client deleted successfully",
+          errors: []
+        }
+      else
+        {
+          message: "Client failed to delete",
+          errors: [ client_service.errors ]
+        }
       end
-    else
-      raise GraphQL::ExecutionError, "User not logged in"
+    rescue GraphQL::ExecutionError => err
+      {
+        message: "Client failed to delete",
+        errors: [ err.message ]
+      }
     end
   end
 end

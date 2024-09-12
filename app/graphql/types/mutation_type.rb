@@ -22,5 +22,8 @@ module Types
     field :delete_venue, mutation: Mutations::Venues::DeleteVenue
     field :courier_signin, mutation: Mutations::Couriers::CourierSignin
     field :courier_signout, mutation: Mutations::Couriers::CourierSignout
+    field :create_order_group, mutation: Mutations::OrderGroups::CreateOrderGroup
+    field :edit_order_group, mutation: Mutations::OrderGroups::EditOrderGroup
+    field :delete_order_group, mutation: Mutations::OrderGroups::DeleteOrderGroup
   end
 end
