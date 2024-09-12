@@ -4,14 +4,15 @@ class Resolvers::Clients::GetClientById < Resolvers::BaseResolver
   argument :client_id, ID, required: true
 
   def resolve(client_id:)
-    user = current_user
-    if user
-      ActsAsTenant.with_tenant(user.tenant) do
-        membership = Membership.find_by(client_id: client_id)
-        Client.find(membership.client_id)
+    begin
+      client_service = ::Clients::ClientService.new(current_user: current_user, client_id: client_id).execute_get_client_by_id
+      if client_service.success?
+        client_service.client
+      else
+        raise GraphQL::ExecutionError, client_service.errors
       end
-    else
-      raise GraphQL::ExecutionError, "User not logged in"
+    rescue GraphQL::ExecutionError => err
+      raise GraphQL::ExecutionError, err.message
     end
   end
 end
