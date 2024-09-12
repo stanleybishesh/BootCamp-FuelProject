@@ -6,26 +6,27 @@ class Mutations::OrderGroups::CreateOrderGroup < Mutations::BaseMutation
   field :errors, [ String ], null: true
 
   def resolve(order_group_info:)
-    user = current_user
-    if user
-      ActsAsTenant.with_tenant(user.tenant) do
-        order_group = OrderGroup.new(order_group_info.to_h)
-        if order_group.save
-          {
-            order_group: order_group,
-            message: "Order Group created successfully",
-            errors: []
-          }
-        else
-          {
-            order_group: nil,
-            message: "Order Group failed to create",
-            errors: [ order_group.errors.full_messages ]
-          }
-        end
+    begin
+      order_group_service = ::OrderGroups::OrderGroupService.new(order_group_info.to_h.merge(current_user: current_user)).execute_create_order_group
+      if order_group_service.success?
+        {
+          order_group: order_group_service.order_group,
+          message: "Order Group created successfully",
+          errors: []
+        }
+      else
+        {
+          order_group: nil,
+          message: "Order Group failed to create",
+          errors: [ order_group_service.errors ]
+        }
       end
-    else
-      raise GraphQL::ExecutionError, "User not logged in"
+    rescue GraphQL::ExecutionError => err
+      {
+        order_group: nil,
+        message: "Order Group failed to create",
+        errors: [ err.message ]
+      }
     end
   end
 end

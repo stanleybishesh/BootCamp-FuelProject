@@ -7,26 +7,28 @@ class Mutations::OrderGroups::EditOrderGroup < Mutations::BaseMutation
   field :errors, [ String ], null: true
 
   def resolve(order_group_id:, order_group_info:)
-    user = current_user
-    if user
-      ActsAsTenant.with_tenant(user.tenant) do
-        order_group = OrderGroup.find(order_group_id)
-        if order_group.update(order_group_info.to_h)
-          {
-            order_group: order_group,
-            message: "Order Group updated successfully",
-            errors: []
-          }
-        else
-          {
-            order_group: nil,
-            message: "Order Group failed to edit",
-            errors: [ order_group.errors.full_messages ]
-          }
-        end
+    begin
+      order_group_service = ::OrderGroups::OrderGroupService.new(order_group_info.to_h.merge(current_user: current_user, order_group_id: order_group_id)).execute_edit_order_group
+
+      if order_group_service.success?
+        {
+          order_group: order_group_service.order_group,
+          message: "Order Group updated successfully",
+          errors: []
+        }
+      else
+        {
+          order_group: nil,
+          message: "Order Group failed to edit",
+          errors: [ order_group_service.errors ]
+        }
       end
-    else
-      raise GraphQL::ExecutionError, "User not logged in"
+    rescue GraphQL::ExecutionError => err
+      {
+        order_group: nil,
+        message: "Order Group failed to edit",
+        errors: [ err.message ]
+      }
     end
   end
 end
