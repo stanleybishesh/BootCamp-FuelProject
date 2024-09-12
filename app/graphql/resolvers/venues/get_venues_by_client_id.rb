@@ -4,16 +4,15 @@ class Resolvers::Venues::GetVenuesByClientId < Resolvers::BaseResolver
   argument :client_id, ID, required: true
 
   def resolve(client_id:)
-    user = current_user
-    if user
-      ActsAsTenant.with_tenant(user.tenant) do
-        membership = Membership.find_by(client_id: client_id)
-        raise GraphQL::ExecutionError, "Client not found in this tenant" if membership.nil?
-        client = Client.find(membership.client_id)
-        client.venues
+    begin
+      venue_service = ::Venues::VenueService.new(client_id: client_id, current_user: current_user).execute_get_venues_by_client_id
+      if venue_service.success?
+        venue_service.venues
+      else
+        raise GraphQL::ExecutionError, venue_service.errors
       end
-    else
-      raise GraphQL::ExecutionError, "User not logged in"
+    rescue GraphQL::ExecutionError => err
+      raise GraphQL::ExecutionError, err.message
     end
   end
 end

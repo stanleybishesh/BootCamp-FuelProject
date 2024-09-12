@@ -3,27 +3,27 @@ class Mutations::Venues::DeleteVenue < Mutations::BaseMutation
   argument :venue_id, ID, required: true
 
   field :message, String, null: true
+  field :errors, [ String ], null: true
 
   def resolve(client_id:, venue_id:)
-    user = current_user
-    if user
-      ActsAsTenant.with_tenant(user.tenant) do
-        membership = Membership.find_by(client_id: client_id)
-        raise GraphQL::ExecutionError, "Client not found in this tenant" if membership.nil?
-        client = Client.find(membership.client_id)
-        venue = client.venues.find(venue_id)
-        if venue.destroy
-          {
-            message: "Venue successfully deleted"
-          }
-        else
-          {
-            message: "Venue failed to delete"
-          }
-        end
+    begin
+      venue_service = ::Venues::VenueService.new(client_id: client_id, venue_id: venue_id, current_user: current_user).execute_delete_venue
+      if venue_service.success?
+        {
+          message: "Venue deleted successfully",
+          errors: []
+        }
+      else
+        {
+          message: "Venue failed to delete",
+          errors: [ venue_service.errors ]
+        }
       end
-    else
-      raise GraphQL::ExecutionError, "User not logged in"
+    rescue GraphQL::ExecutionError => err
+      {
+        message: "Venue failed to edit",
+        errors: [ err.message ]
+      }
     end
   end
 end

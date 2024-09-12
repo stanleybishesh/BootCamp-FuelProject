@@ -1,30 +1,28 @@
 class Mutations::Clients::CreateClient < Mutations::BaseMutation
-  argument :name, String, required: true
+  argument :client_info, Types::InputObjects::ClientInputType, required: true
 
   field :client, Types::Clients::ClientType, null: false
-  field :message, String, null: true
+  field :errors, [ String ], null: true
 
-  def resolve(name:)
-    user = current_user
-    if user
-      ActsAsTenant.with_tenant(user.tenant) do
-        client = Client.new(name: name)
-        if client.save
-          membership = Membership.new(client_id: client.id)
-          if membership.save
-            {
-              message: "Client Registered Successfully",
-              client: client
-            }
-          else
-            raise GraphQL::ExecutionError, "Client saved but no membership created"
-          end
-        else
-          raise GraphQL::ExecutionError, "Client could not be registered"
-        end
+  def resolve(client_info:)
+    begin
+      client_service = ::Clients::ClientService.new(client_info.to_h.merge(current_user: current_user)).execute_create_client
+      if client_service.success?
+        {
+          client: client_service.client,
+          errors: []
+        }
+      else
+        {
+          client: nil,
+          errors: [ client_service.errors ]
+        }
       end
-    else
-      raise GraphQL::ExecutionError, "User not logged in"
+    rescue GraphQL::ExecutionError => err
+      {
+        client: nil,
+        errors: [ err.message ]
+      }
     end
   end
 end

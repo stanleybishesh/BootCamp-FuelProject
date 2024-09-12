@@ -4,29 +4,30 @@ class Mutations::Venues::CreateVenue < Mutations::BaseMutation
 
   field :venue, Types::Venues::VenueType, null: false
   field :message, String, null: true
+  field :errors, [ String ], null: true
 
   def resolve(client_id:, name:)
-    user = current_user
-    if user
-      ActsAsTenant.with_tenant(user.tenant) do
-        membership = Membership.find_by(client_id: client_id)
-        raise GraphQL::ExecutionError, "Client not found in this tenant" if membership.nil?
-        client = Client.find(membership.client_id)
-        venue = client.venues.build(name: name, client_id: client_id)
-        if venue.save
-          {
-            venue: venue,
-            message: "Venue successfully created"
-          }
-        else
-          {
-            venue: nil,
-            message: "Venue failed to create"
-          }
-        end
+    begin
+      venue_service = ::Venues::VenueService.new(client_id: client_id, name: name, current_user: current_user).execute_create_venue
+      if venue_service.success?
+        {
+          venue: venue_service.venue,
+          message: "Venue created successfully",
+          errors: []
+        }
+      else
+        {
+          venue: nil,
+          message: "Venue failed to create",
+          errors: [ venue_service.errors ]
+        }
       end
-    else
-      raise GraphQL::ExecutionError, "User not logged in"
+    rescue GraphQL::ExecutionError => err
+      {
+        venue: nil,
+        message: "Venue failed to create",
+        errors: [ err.message ]
+      }
     end
   end
 end

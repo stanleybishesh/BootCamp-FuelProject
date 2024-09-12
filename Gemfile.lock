@@ -246,6 +246,8 @@ GEM
     regexp_parser (2.9.2)
     reline (0.5.9)
       io-console (~> 0.5)
+    request_store (1.7.0)
+      rack (>= 1.4)
     responders (3.1.1)
       actionpack (>= 5.2)
       railties (>= 5.2)
@@ -358,6 +360,7 @@ DEPENDENCIES
   rack-cors
   rails (~> 7.2.1)
   redis (>= 4.0.1)
+  request_store (~> 1.7)
   rubocop-rails-omakase
   selenium-webdriver
   sprockets-rails
