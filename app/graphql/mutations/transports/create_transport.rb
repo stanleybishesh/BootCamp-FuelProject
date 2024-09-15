@@ -8,30 +8,27 @@ module Mutations
       field :message, String, null: false
 
       def resolve(transport_info:)
-        user = current_user
-        if user
-          ActsAsTenant.with_tenant(user.tenant) do
-            transport_attr = transport_info.to_h
-
-            transport = Transport.new(transport_attr)
-
-            if transport.save
-              {
-                transport: transport,
-                errors: [],
-                message: "Transport created Successfully"
-              }
-            else
-              {
-                transport: nil,
-                errors: [ transport.errors.full_message ],
-                message: []
-              }
-
-            end
+        begin
+          transport_service = ::Transports::TransportService.new(transport_info: transport_info.to_h, current_user: current_user).execute_create_transport
+          if transport_service.success?
+            {
+              transport: transport_service.transport,
+              errors: [],
+              message: "Transport created successfully"
+            }
+          else
+            {
+              transport: nil,
+              errors: [ transport_service.errors ],
+              message: "Transport creation failed"
+            }
           end
-        else
-          raise GraphQL::ExecutionError, "User not logged in"
+        rescue GraphQL::ExecutionError => err
+          {
+            transport: nil,
+            message: "Transport failed to create",
+            errors: [ err.message ]
+          }
         end
       end
     end

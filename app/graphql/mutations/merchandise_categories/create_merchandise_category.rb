@@ -23,7 +23,7 @@ class Mutations::MerchandiseCategories::CreateMerchandiseCategory < Mutations::B
         end
       end
     else
-      raise GraphQL::ExecutionError, "User not logged in"
+      raise GraphQL::ExecutionError, "Merchandiese cannot be created"
     end
   end
 end
