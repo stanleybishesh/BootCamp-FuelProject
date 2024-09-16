@@ -29,8 +29,8 @@ module Merchandises
       self
     end
 
-    def execute_get_merchandise_by_category
-      handle_get_merchandise_by_category
+    def execute_get_merchandises_by_category
+      handle_get_merchandises_by_category
       self
     end
 
@@ -55,6 +55,8 @@ module Merchandises
               @success = true
               @errors = []
             else
+              raise ActiveRecord::RecordNotSaved, "Merchandise cannot be saved"
+              @success = false
               @errors = @merchandise.errors.full_messages
             end
           end
@@ -62,7 +64,6 @@ module Merchandises
           raise ActiveRecord::RecordNotFound, "User not logged in"
           @success = false
           @errors << "User not logged in"
-
         end
       rescue ActiveRecord::RecordNotSaved, ActiveRecord::RecordNotFound => err
         @success = false
@@ -79,29 +80,31 @@ module Merchandises
         if user
           ActsAsTenant.with_tenant(user.tenant) do
             @merchandise = Merchandise.find(params[:merchandise_id])
-            if @merchandise.update(params[:merchandise_info].to_h)
+            if @merchandise.update(merchandise_params)
               @success = true
               @errors = []
             else
+              raise ActiveRecord::RecordNotSaved, "Merchandise cannot be updated"
               @success = false
               @errors = @merchandise.errors.full_messages
             end
           end
         else
           raise ActiveRecord::RecordNotFound, "User not logged in"
+            @success = false
+            @errors << "User not logged in"
         end
+      rescue ActiveRecord::RecordNotSaved => err
+        @success = false
+        @errors << err.message
       rescue ActiveRecord::RecordNotFound => err
         @success = false
         @errors << err.message
-      rescue ActiveRecord::RecordInvalid => err
-        @success = false
-        @errors << "Merchandise update failed: #{err.message}"
       rescue StandardError => err
         @success = false
         @errors << "An unexpected error occurred: #{err.message}"
       end
     end
-
 
     def handle_delete_merchandise
       begin
@@ -113,6 +116,7 @@ module Merchandises
               @success = true
               @errors = []
             else
+              raise ActiveRecord::RecordNotDestroyed, "Merchandise is not deleted"
               @success = false
               @errors = @merchandise.errors.full_messages
             end
@@ -122,7 +126,7 @@ module Merchandises
           @success = false
           @errors << "User not logged in"
         end
-      rescue ActiveRecord::RecordNotFound => err
+      rescue ActiveRecord::RecordNotDestroyed, ActiveRecord::RecordNotFound => err
         @success = false
         @errors << err.message
       rescue StandardError => err
@@ -130,7 +134,6 @@ module Merchandises
         @errors << "An unexpected error occurred: #{err.message}"
       end
     end
-
 
     def handle_get_all_merchandises
       begin
@@ -155,8 +158,7 @@ module Merchandises
       end
     end
 
-
-    def handle_get_merchandise_by_category
+    def handle_get_merchandises_by_category
       begin
         user = current_user
         if user
@@ -180,14 +182,12 @@ module Merchandises
       end
     end
 
-
     def current_user
       params[:current_user]
     end
 
-
     def merchandise_params
-      params[:merchandise_info]
+      ActionController::Parameters.new(params).permit(:name, :status, :description, :price, :unit)
     end
   end
 end

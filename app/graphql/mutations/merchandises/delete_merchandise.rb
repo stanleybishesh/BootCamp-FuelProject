@@ -7,9 +7,9 @@ module Mutations
       field :errors, [ String ], null: false
 
       def resolve(merchandise_id:)
-        service = ::Merchandises::MerchandiseService.new({ merchandise_id: merchandise_id }.merge(current_user: current_user)).execute_delete_merchandise
+        merchandise_service = ::Merchandises::MerchandiseService.new({ merchandise_id: merchandise_id }.merge(current_user: current_user)).execute_delete_merchandise
 
-        if service.success?
+        if merchandise_service.success?
           {
             message: "Merchandise Deleted",
             errors: []
@@ -17,7 +17,7 @@ module Mutations
         else
           {
             message: "Failed to delete Merchandise",
-            errors: service.errors
+            errors: merchandise_service.errors
           }
         end
       end

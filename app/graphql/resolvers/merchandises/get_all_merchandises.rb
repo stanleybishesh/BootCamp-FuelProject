@@ -4,10 +4,10 @@ module Resolvers
       type [ Types::Merchandises::MerchandiseType ], null: false
 
       def resolve
-        service = ::Merchandises::MerchandiseService.new(current_user: current_user).execute_get_all_merchandises
+        merchandise_service = ::Merchandises::MerchandiseService.new(current_user: current_user).execute_get_all_merchandises
 
-        if service.success?
-          service.merchandises
+        if merchandise_service.success?
+          merchandise_service.merchandises
         else
           raise GraphQL::ExecutionError, service.errors
         end

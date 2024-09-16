@@ -5,10 +5,10 @@ module Resolvers
       type [ Types::Merchandises::MerchandiseType ], null: false
 
       def resolve(merchandise_category_id:)
-        service = ::Merchandises::MerchandiseService.new({ merchandise_category_id: merchandise_category_id }.merge(current_user: current_user)).execute_get_merchandise_by_category
+        merchandise_service = ::Merchandises::MerchandiseService.new({ merchandise_category_id: merchandise_category_id }.merge(current_user: current_user)).execute_get_merchandises_by_category
 
-        if service.success?
-          service.merchandises
+        if merchandise_service.success?
+          merchandise_service.merchandises
         else
           raise GraphQL::ExecutionError, service.errors
         end
