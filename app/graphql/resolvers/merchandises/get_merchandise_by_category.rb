@@ -1,15 +1,18 @@
-class Resolvers::Merchandises::GetMerchandiseByCategory < Resolvers::BaseResolver
-  argument :merchandise_category_id, ID, required: true
-  type [ Types::Merchandises::MerchandiseType ], null: false
+module Resolvers
+  module Merchandises
+    class GetMerchandiseByCategory < BaseResolver
+      argument :merchandise_category_id, ID, required: true
+      type [ Types::Merchandises::MerchandiseType ], null: false
 
-  def resolve(merchandise_category_id:)
-    user = current_user
-    if user
-      ActsAsTenant.with_tenant(user.tenant) do
-        MerchandiseCategory.find(merchandise_category_id).merchandises
+      def resolve(merchandise_category_id:)
+        service = ::Merchandises::MerchandiseService.new({ merchandise_category_id: merchandise_category_id }.merge(current_user: current_user)).execute_get_merchandise_by_category
+
+        if service.success?
+          service.merchandises
+        else
+          raise GraphQL::ExecutionError, service.errors
+        end
       end
-    else
-      raise GraphQL::ExecutionError, "User not logged in"
     end
   end
 end

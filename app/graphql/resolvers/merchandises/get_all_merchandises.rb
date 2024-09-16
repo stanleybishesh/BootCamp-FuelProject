@@ -1,14 +1,17 @@
-class Resolvers::Merchandises::GetAllMerchandises < Resolvers::BaseResolver
-  type [ Types::Merchandises::MerchandiseType ], null: false
+module Resolvers
+  module Merchandises
+    class GetAllMerchandises < BaseResolver
+      type [ Types::Merchandises::MerchandiseType ], null: false
 
-  def resolve
-    user = current_user
-    if user
-      ActsAsTenant.with_tenant(user.tenant) do
-        Merchandise.all
+      def resolve
+        service = ::Merchandises::MerchandiseService.new(current_user: current_user).execute_get_all_merchandises
+
+        if service.success?
+          service.merchandises
+        else
+          raise GraphQL::ExecutionError, service.errors
+        end
       end
-    else
-      raise GraphQL::ExecutionError, "User not logged in"
     end
   end
 end
