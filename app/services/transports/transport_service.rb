@@ -117,6 +117,7 @@ module Transports
               @success = true
               @errors = []
             else
+              raise ActiveRecord::RecordNotDestroyed, "Failed to delete transport"
               @success = false
               @errors = @transport.errors.full_messages
             end
@@ -126,6 +127,9 @@ module Transports
           @success = false
           @errors << "User not logged in"
         end
+      rescue ActiveRecord::RecordNotDestroyed => err
+        @success = false
+        @errors << err.message
       rescue ActiveRecord::RecordNotFound => err
         @success = false
         @errors << err.message
