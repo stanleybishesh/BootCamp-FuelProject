@@ -42,15 +42,14 @@ module Couriers
               @success = true
               @errors = []
             else
-              raise ActiveRecord::ActiveRecordError, "Invalid email or password"
+              @success = false
+              @errors << "Invalid Email or Password"
             end
           end
         else
-          raise ActiveRecord::RecordNotFound, "Courier not registered"
+          @success = false
+          @errors << "Courier not logged in"
         end
-      rescue ActiveRecord::RecordNotFound, ActiveRecord::ActiveRecordError => err
-        @success = false
-        @errors << err.message
       rescue StandardError => err
         @success = false
         @errors << "An unexpected error occurred: #{err.message}"
@@ -68,11 +67,9 @@ module Couriers
             @errors = []
           end
         else
-          raise ActiveRecord::RecordNotFound, "Courier not logged in"
+          @success = false
+          @errors << "Courier not logged in"
         end
-      rescue ActiveRecord::RecordNotFound => err
-        @success = false
-        @errors << err.message
       rescue StandardError => err
         @success = false
         @errors << "An unexpected error occurred: #{err.message}"
