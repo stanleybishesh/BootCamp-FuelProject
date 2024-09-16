@@ -48,23 +48,20 @@ module OrderGroups
             if @order_group.save
               @success = true
               @errors = []
+              if @order_group.recurring_order?
+                RecurringOrderJob.perform_async(@order_group.id)
+                @success = true
+                @errors = []
+              end
             else
-              raise ActiveRecord::RecordNotSaved, "Order Group failed to create"
               @success = false
               @errors = [ @order_group.errors.full_messages ]
             end
           end
         else
-          raise ActiveRecord::RecordNotFound, "User not logged in"
           @success = false
           @errors << "User not logged in"
         end
-      rescue ActiveRecord::RecordNotFound => err
-        @success = false
-        @errors << err.message
-      rescue ActiveRecord::RecordNotSaved => err
-        @success = false
-        @errors << err.message
       rescue StandardError => err
         @success = false
         @errors << "An unexpected error occurred: #{err.message}"
@@ -82,17 +79,15 @@ module OrderGroups
               @success = true
               @errors = []
             else
-              raise ActiveRecord::RecordNotSaved, "Order Group failed to edit"
               @success = false
               @errors = [ @order_group.errors.full_messages ]
             end
           end
         else
-          raise ActiveRecord::RecordNotFound, "User not logged in"
           @success = false
           @errors << "User not logged in"
         end
-      rescue ActiveRecord::RecordNotFound, ActiveRecord::RecordNotSaved => err
+      rescue ActiveRecord::RecordNotFound => err
         @success = false
         @errors << err.message
       rescue StandardError => err
@@ -112,13 +107,11 @@ module OrderGroups
               @success = true
               @errors = []
             else
-              raise ActiveRecord::RecordNotDestroyed, "Order Group failed to delete"
               @success = false
               @errors = [ @order_group.errors.full_messages ]
             end
           end
         else
-          raise ActiveRecord::RecordNotFound, "User not logged in"
           @success = false
           @errors << "User not logged in"
         end
@@ -141,13 +134,9 @@ module OrderGroups
             @errors = []
           end
         else
-          raise ActiveRecord::RecordNotFound, "User not logged in"
           @success = false
           @errors << "User not logged in"
         end
-      rescue ActiveRecord::RecordNotFound => err
-        @success = false
-        @errors << err.message
       rescue StandardError => err
         @success = false
         @errors << "An unexpected error occurred: #{err.message}"
@@ -159,7 +148,7 @@ module OrderGroups
     end
 
     def order_group_params
-      ActionController::Parameters.new(params).permit(:tenant_id, :client_id, :venue_id, :start_on, :completed_on, :status,
+      ActionController::Parameters.new(params).permit(:tenant_id, :client_id, :venue_id, :start_on, :completed_on, :status, recurring: [ :frequency, :start_date, :end_date ],
          delivery_order_attributes: [
           :order_group_id, :source, :vehicle_type, :transport_id, :courier_id,
            line_items_attributes: [

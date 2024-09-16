@@ -5,4 +5,5 @@ class Types::InputObjects::OrderGroupInputType < Types::BaseInputObject
   argument :client_id, ID, required: true
   argument :venue_id, ID, required: true
   argument :delivery_order_attributes, Types::InputObjects::DeliveryOrderInputType, required: true
+  argument :recurring, Types::InputObjects::RecurringInputType, required: false
 end

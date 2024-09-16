@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_09_11_112148) do
+ActiveRecord::Schema[7.2].define(version: 2024_09_16_091444) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -101,6 +101,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_09_11_112148) do
     t.date "start_on"
     t.datetime "completed_on"
     t.string "status"
+    t.jsonb "recurring"
     t.index ["client_id"], name: "index_order_groups_on_client_id"
     t.index ["tenant_id"], name: "index_order_groups_on_tenant_id"
     t.index ["venue_id"], name: "index_order_groups_on_venue_id"

@@ -8,6 +8,6 @@
 
 :scheduler:
   :schedule:
-    recurring_order_job:
-      cron: '0 * * * * *'
-      class: RecurringOrderJob
+    verify_recurring_orders:
+      cron: "0 0 * * *" # Every night at midnight
+      class: VerifyRecurringOrdersJob
