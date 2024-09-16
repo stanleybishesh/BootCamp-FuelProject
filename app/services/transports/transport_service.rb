@@ -44,69 +44,95 @@ module Transports
     private
 
     def handle_create_transport
-      user = current_user
-      if user
-        ActsAsTenant.with_tenant(user.tenant) do
-          @transport = Transport.new(transport_params)
-          if @transport.save
-            @success = true
-            @errors = []
-          else
-            @success = false
-            @errors = @transport.errors.full_messages
+      begin
+        user = current_user
+        if user
+          ActsAsTenant.with_tenant(user.tenant) do
+            @transport = Transport.new(transport_params)
+            if @transport.save
+              @success = true
+              @errors = []
+            else
+              raise ActiveRecord::RecordNotSaved, "Transport failed to create"
+              @success = false
+              @errors = @transport.errors.full_messages
+            end
           end
+        else
+          raise ActiveRecord::RecordNotFound, "User not logged in"
+          @success = false
+          @errors << "User not logged in"
         end
-      else
+      rescue ActiveRecord::RecordNotSaved => err
         @success = false
-        @errors << "User not logged in"
+        @errors << err.message
+      rescue ActiveRecord::RecordNotFound => err
+        @success = false
+        @errors << err.message
+      rescue StandardError => err
+        @success = false
+        @errors << "An unexpected error occurred: #{err.message}"
       end
-    rescue StandardError => err
-      @success = false
-      @errors << "An unexpected error occurred: #{err.message}"
     end
 
     def handle_update_transport
-      user = current_user
-      if user
-        ActsAsTenant.with_tenant(user.tenant) do
-          @transport = Transport.find(params[:transport_id])
-          if @transport.update(transport_params)
-            @success = true
-            @errors = []
-          else
-            @success = false
-            @errors = @transport.errors.full_messages
+      begin
+        user = current_user
+        if user
+          ActsAsTenant.with_tenant(user.tenant) do
+            @transport = Transport.find(params[:transport_id])
+            if @transport.update(transport_params)
+              @success = true
+              @errors = []
+            else
+              raise ActiveRecord::RecordNotSaved, "Transport failed to update"
+              @success = false
+              @errors = @transport.errors.full_messages
+            end
           end
+        else
+          raise ActiveRecord::RecordNotFound, "User not logged in"
+          @success = false
+          @errors << "User not logged in"
         end
-      else
+      rescue ActiveRecord::RecordNotSaved => err
         @success = false
-        @errors << "User not logged in"
+        @errors << err.message
+      rescue ActiveRecord::RecordNotFound => err
+        @success = false
+        @errors << err.message
+      rescue StandardError => err
+        @success = false
+        @errors << "An unexpected error occurred: #{err.message}"
       end
-    rescue StandardError => err
-      @success = false
-      @errors << "An unexpected error occurred: #{err.message}"
     end
 
     def handle_delete_transport
-      user = current_user
-      if user
-        ActsAsTenant.with_tenant(user.tenant) do
-          @transport = Transport.find(params[:transport_id])
-          if @transport.destroy
-            @success = true
-            @errors = []
-          else
-            @success = false
-            @errors = @transport.errors.full_messages
+      begin
+        user = current_user
+        if user
+          ActsAsTenant.with_tenant(user.tenant) do
+            @transport = Transport.find(params[:transport_id])
+            if @transport.destroy
+              @success = true
+              @errors = []
+            else
+              @success = false
+              @errors = @transport.errors.full_messages
+            end
           end
+        else
+          raise ActiveRecord::RecordNotFound, "User not logged in"
+          @success = false
+          @errors << "User not logged in"
         end
-      else
+      rescue ActiveRecord::RecordNotFound => err
         @success = false
-        @errors << "User not logged in"
+        @errors << err.message
+      rescue StandardError => err
+        @success = false
+        @errors << "An unexpected error occurred: #{err.message}"
       end
-    rescue StandardError => err
-      @success = false
-      @errors << "An unexpected error occurred: #{err.message}"
     end
 
     def handle_get_all_transport
@@ -114,7 +140,7 @@ module Transports
         user = current_user
         if user
           ActsAsTenant.with_tenant(user.tenant) do
-            @transport = Transport.all
+            @transports = Transport.all
             @success = true
             @errors = []
           end
@@ -142,12 +168,16 @@ module Transports
             @errors = []
           end
         else
-          @errors << "User not logged in"
+          raise ActiveRecord::RecordNotFound, "User not logged in"
           @success = false
+          @errors << "User not logged in"
         end
+      rescue ActiveRecord::RecordNotFound => err
+        @success = false
+        @errors << err.message
       rescue StandardError => err
+        @success = false
         @errors << "An unexpected error occurred: #{err.message}"
-        nil
       end
     end
 

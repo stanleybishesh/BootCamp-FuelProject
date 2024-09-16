@@ -8,7 +8,7 @@ module Resolvers
           transport_service = ::Transports::TransportService.new(current_user: current_user).execute_get_all_transport
 
           if transport_service.success?
-            transport_service.transport
+            transport_service.transports
           else
             raise GraphQL::ExecutionError, transport_service.errors
           end
