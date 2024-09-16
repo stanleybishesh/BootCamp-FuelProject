@@ -55,19 +55,14 @@ module Merchandises
               @success = true
               @errors = []
             else
-              raise ActiveRecord::RecordNotSaved, "Merchandise cannot be saved"
               @success = false
               @errors = @merchandise.errors.full_messages
             end
           end
         else
-          raise ActiveRecord::RecordNotFound, "User not logged in"
           @success = false
           @errors << "User not logged in"
         end
-      rescue ActiveRecord::RecordNotSaved, ActiveRecord::RecordNotFound => err
-        @success = false
-        @errors << err.message
       rescue StandardError => err
         @success = false
         @errors << "An unexpected error occurred: #{err.message}"
@@ -84,22 +79,14 @@ module Merchandises
               @success = true
               @errors = []
             else
-              raise ActiveRecord::RecordNotSaved, "Merchandise cannot be updated"
               @success = false
               @errors = @merchandise.errors.full_messages
             end
           end
         else
-          raise ActiveRecord::RecordNotFound, "User not logged in"
             @success = false
             @errors << "User not logged in"
         end
-      rescue ActiveRecord::RecordNotSaved => err
-        @success = false
-        @errors << err.message
-      rescue ActiveRecord::RecordNotFound => err
-        @success = false
-        @errors << err.message
       rescue StandardError => err
         @success = false
         @errors << "An unexpected error occurred: #{err.message}"
@@ -116,19 +103,14 @@ module Merchandises
               @success = true
               @errors = []
             else
-              raise ActiveRecord::RecordNotDestroyed, "Merchandise is not deleted"
               @success = false
               @errors = @merchandise.errors.full_messages
             end
           end
         else
-          raise ActiveRecord::RecordNotFound, "User not logged in"
           @success = false
           @errors << "User not logged in"
         end
-      rescue ActiveRecord::RecordNotDestroyed, ActiveRecord::RecordNotFound => err
-        @success = false
-        @errors << err.message
       rescue StandardError => err
         @success = false
         @errors << "An unexpected error occurred: #{err.message}"
@@ -145,13 +127,9 @@ module Merchandises
             @errors = []
           end
         else
-          raise ActiveRecord::RecordNotFound, "User not logged in"
           @success = false
           @errors << "User not logged in"
         end
-      rescue ActiveRecord::RecordNotFound => err
-        @success = false
-        @errors << err.message
       rescue StandardError => err
         @success = false
         @errors << "An unexpected error occurred: #{err.message}"
@@ -169,13 +147,9 @@ module Merchandises
             @errors = []
           end
         else
-          raise ActiveRecord::RecordNotFound, "User not logged in"
           @success = false
           @errors << "User not logged in"
         end
-      rescue ActiveRecord::RecordNotFound => err
-        @success = false
-        @errors << err.message
       rescue StandardError => err
         @success = false
         @errors << "An unexpected error occurred: #{err.message}"
