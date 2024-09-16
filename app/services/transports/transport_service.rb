@@ -53,22 +53,14 @@ module Transports
               @success = true
               @errors = []
             else
-              raise ActiveRecord::RecordNotSaved, "Transport failed to create"
               @success = false
               @errors = @transport.errors.full_messages
             end
           end
         else
-          raise ActiveRecord::RecordNotFound, "User not logged in"
           @success = false
           @errors << "User not logged in"
         end
-      rescue ActiveRecord::RecordNotSaved => err
-        @success = false
-        @errors << err.message
-      rescue ActiveRecord::RecordNotFound => err
-        @success = false
-        @errors << err.message
       rescue StandardError => err
         @success = false
         @errors << "An unexpected error occurred: #{err.message}"
@@ -85,22 +77,14 @@ module Transports
               @success = true
               @errors = []
             else
-              raise ActiveRecord::RecordNotSaved, "Transport failed to update"
               @success = false
               @errors = @transport.errors.full_messages
             end
           end
         else
-          raise ActiveRecord::RecordNotFound, "User not logged in"
           @success = false
           @errors << "User not logged in"
         end
-      rescue ActiveRecord::RecordNotSaved => err
-        @success = false
-        @errors << err.message
-      rescue ActiveRecord::RecordNotFound => err
-        @success = false
-        @errors << err.message
       rescue StandardError => err
         @success = false
         @errors << "An unexpected error occurred: #{err.message}"
@@ -117,22 +101,14 @@ module Transports
               @success = true
               @errors = []
             else
-              raise ActiveRecord::RecordNotDestroyed, "Failed to delete transport"
               @success = false
               @errors = @transport.errors.full_messages
             end
           end
         else
-          raise ActiveRecord::RecordNotFound, "User not logged in"
           @success = false
           @errors << "User not logged in"
         end
-      rescue ActiveRecord::RecordNotDestroyed => err
-        @success = false
-        @errors << err.message
-      rescue ActiveRecord::RecordNotFound => err
-        @success = false
-        @errors << err.message
       rescue StandardError => err
         @success = false
         @errors << "An unexpected error occurred: #{err.message}"
@@ -149,13 +125,9 @@ module Transports
             @errors = []
           end
         else
-          raise ActiveRecord::RecordNotFound, "User not logged in"
           @success = false
           @errors << "User not logged in"
         end
-      rescue ActiveRecord::RecordNotFound => err
-        @success = false
-        @errors << err.message
       rescue StandardError => err
         @success = false
         @errors << "An unexpected error occurred: #{err.message}"
@@ -172,13 +144,9 @@ module Transports
             @errors = []
           end
         else
-          raise ActiveRecord::RecordNotFound, "User not logged in"
           @success = false
           @errors << "User not logged in"
         end
-      rescue ActiveRecord::RecordNotFound => err
-        @success = false
-        @errors << err.message
       rescue StandardError => err
         @success = false
         @errors << "An unexpected error occurred: #{err.message}"
@@ -190,7 +158,7 @@ module Transports
     end
 
     def transport_params
-      ActionController::Parameters.new(params).permit(:name, :status, :vehicle_type)
+      ActionController::Parameters.new(params[:transport_info]).permit(:name, :status, :vehicle_type)
     end
   end
 end

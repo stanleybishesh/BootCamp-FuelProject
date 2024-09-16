@@ -9,7 +9,7 @@ module Mutations
 
       def resolve(transport_info:)
         begin
-          transport_service = ::Transports::TransportService.new(transport_info: transport_info.to_h, current_user: current_user).execute_create_transport
+          transport_service = ::Transports::TransportService.new({ transport_info: transport_info.to_h }.merge(current_user: current_user)).execute_create_transport
           if transport_service.success?
             {
               transport: transport_service.transport,
