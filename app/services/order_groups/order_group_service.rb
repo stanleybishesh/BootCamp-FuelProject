@@ -1,7 +1,7 @@
 module OrderGroups
   class OrderGroupService
     attr_reader :params
-    attr_accessor :success, :errors, :order_group, :order_groups
+    attr_accessor :success, :errors, :order_group, :order_groups, :client
 
     def initialize(params = {})
       @params = params
@@ -49,22 +49,22 @@ module OrderGroups
               @success = true
               @errors = []
             else
-              raise ActiveRecord::RecordNotSaved, "Order Group failed to create"
+              # raise ActiveRecord::RecordNotSaved, "Order Group failed to create"
               @success = false
-              @errors = [ @order_group.errors.full_messages ]
+              @errors = @order_group.errors.full_messages
             end
           end
         else
-          raise ActiveRecord::RecordNotFound, "User not logged in"
+          # raise ActiveRecord::RecordNotFound, "User not logged in"
           @success = false
           @errors << "User not logged in"
         end
-      rescue ActiveRecord::RecordNotFound => err
-        @success = false
-        @errors << err.message
-      rescue ActiveRecord::RecordNotSaved => err
-        @success = false
-        @errors << err.message
+      # rescue ActiveRecord::RecordNotFound => err
+      #   @success = false
+      #   @errors << err.message
+      # rescue ActiveRecord::RecordNotSaved => err
+      #   @success = false
+      #   @errors << err.message
       rescue StandardError => err
         @success = false
         @errors << "An unexpected error occurred: #{err.message}"
@@ -84,7 +84,7 @@ module OrderGroups
             else
               raise ActiveRecord::RecordNotSaved, "Order Group failed to edit"
               @success = false
-              @errors = [ @order_group.errors.full_messages ]
+              @errors = @order_group.errors.full_messages
             end
           end
         else
@@ -106,11 +106,15 @@ module OrderGroups
         user = current_user
         if user
           ActsAsTenant.with_tenant(user.tenant) do
-            @order_group = OrderGroup.find(params[:order_group_id])
+            @order_group = OrderGroup.find_by(id: params[:order_group_id])
             raise ActiveRecord::RecordNotFound, "Order Group not found" if @order_group.nil?
+
+            @client = @order_group.client
             if @order_group.destroy
               @success = true
               @errors = []
+              DeleteOrderGroupMailer.order_group_deleted_email(@client).deliver_later
+
             else
               raise ActiveRecord::RecordNotDestroyed, "Order Group failed to delete"
               @success = false
