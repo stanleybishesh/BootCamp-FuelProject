@@ -9,26 +9,22 @@ module Mutations
       field :message, String, null: true
 
       def resolve(merchandise_category_id:, merchandise_info:)
-        user = current_user
-        if user
-          ActsAsTenant.with_tenant(user.tenant) do
-            merchandise_category = MerchandiseCategory.find(merchandise_category_id)
-            merchandise = merchandise_category.merchandises.build(merchandise_info.to_h)
-            merchandise.merchandise_category_id = merchandise_category_id
-            if merchandise.save
-              {
-                merchandise: merchandise,
-                errors: [],
-                message: "Merchandise created successfully"
-              }
-            else
-              {
-                merchandise: nil,
-                errors: merchandise.errors.full_messages,
-                message: "Unable to create #{merchandise_info.name}"
-              }
-            end
-          end
+        merchandise_service = ::Merchandises::MerchandiseService.new({ merchandise_category_id: merchandise_category_id, merchandise_info: merchandise_info.to_h }.merge(current_user: current_user)).execute_create_merchandise
+
+        if merchandise_service.success?
+          {
+            merchandise: merchandise_service.merchandise,
+
+            errors: [],
+            message: "Merchandise created successfully"
+          }
+
+        else
+          {
+            merchandise: nil,
+            errors: merchandise_service.errors,
+            message: "Merchandise creation failed"
+          }
         end
       end
     end
