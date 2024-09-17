@@ -9,5 +9,5 @@
 :scheduler:
   :schedule:
     verify_recurring_orders:
-      cron: "0 0 * * *" # Every night at midnight
+      cron: "0 * * * *" # Every night at midnight
       class: VerifyRecurringOrdersJob
