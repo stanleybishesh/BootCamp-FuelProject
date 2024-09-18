@@ -21,8 +21,6 @@ module Types
     # Add root-level fields here.
     # They will be entry points for queries on your schema.
 
-    field :user_login, resolver: Resolvers::Users::UserLogin
-    field :fetch_tenant, resolver: Resolvers::Tenants::TenantResolver
     field :get_all_clients, resolver: Resolvers::Clients::GetAllClients
     field :get_client_by_id, resolver: Resolvers::Clients::GetClientById
     field :get_all_merchandise_categories, resolver: Resolvers::MerchandiseCategories::GetAllMerchandiseCategories
@@ -34,5 +32,6 @@ module Types
     field :get_venues_by_client_id, resolver: Resolvers::Venues::GetVenuesByClientId
     field :get_all_courier, resolver: Resolvers::Couriers::CourierResolver
     field :get_all_order_groups, resolver: Resolvers::OrderGroups::GetAllOrderGroups
+    field :get_all_delivery_orders, resolver: Resolvers::DeliveryOrders::GetAllDeliveryOrders
   end
 end

@@ -1,7 +1,7 @@
 module OrderGroups
   class OrderGroupService
     attr_reader :params
-    attr_accessor :success, :errors, :order_group, :order_groups
+    attr_accessor :success, :errors, :order_group, :order_groups, :delivery_orders
 
     def initialize(params = {})
       @params = params
@@ -26,6 +26,11 @@ module OrderGroups
 
     def execute_get_all_order_groups
       handle_get_all_order_groups
+      self
+    end
+
+    def execute_get_all_delivery_orders
+      handle_get_all_delivery_orders
       self
     end
 
@@ -130,6 +135,25 @@ module OrderGroups
         if user
           ActsAsTenant.with_tenant(user.tenant) do
             @order_groups = OrderGroup.all
+            @success = true
+            @errors = []
+          end
+        else
+          @success = false
+          @errors << "User not logged in"
+        end
+      rescue StandardError => err
+        @success = false
+        @errors << "An unexpected error occurred: #{err.message}"
+      end
+    end
+
+    def handle_get_all_delivery_orders
+      begin
+        user = current_user
+        if user
+          ActsAsTenant.with_tenant(user.tenant) do
+            @delivery_orders = DeliveryOrder.all
             @success = true
             @errors = []
           end
