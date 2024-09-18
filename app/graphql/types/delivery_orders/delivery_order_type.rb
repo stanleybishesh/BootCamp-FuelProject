@@ -8,7 +8,7 @@ module Types
       field :source, String
       field :vehicle_type, String
       field :transport_id, ID, null: false
-      field :courier_id, ID, null: false
+      field :courier_id, ID, null: true
       field :created_at, GraphQL::Types::ISO8601DateTime, null: false
       field :updated_at, GraphQL::Types::ISO8601DateTime, null: false
       field :line_items, [ Types::LineItems::LineItemType ], null: false

@@ -1,7 +1,7 @@
 module OrderGroups
   class OrderGroupService
     attr_reader :params
-    attr_accessor :success, :errors, :order_group, :order_groups, :delivery_orders
+    attr_accessor :success, :errors, :order_group, :order_groups, :delivery_orders, :recurring_orders, :non_recurring_orders
 
     def initialize(params = {})
       @params = params
@@ -31,6 +31,21 @@ module OrderGroups
 
     def execute_get_all_delivery_orders
       handle_get_all_delivery_orders
+      self
+    end
+
+    def execute_get_recurring_orders
+      handle_get_recurring_orders
+      self
+    end
+
+    def execute_get_main_recurring_orders
+      handle_get_main_recurring_orders
+      self
+    end
+
+    def execute_get_non_recurring_orders
+      handle_get_non_recurring_orders
       self
     end
 
@@ -154,6 +169,63 @@ module OrderGroups
         if user
           ActsAsTenant.with_tenant(user.tenant) do
             @delivery_orders = DeliveryOrder.all
+            @success = true
+            @errors = []
+          end
+        else
+          @success = false
+          @errors << "User not logged in"
+        end
+      rescue StandardError => err
+        @success = false
+        @errors << "An unexpected error occurred: #{err.message}"
+      end
+    end
+
+    def handle_get_recurring_orders
+      begin
+        user = current_user
+        if user
+          ActsAsTenant.with_tenant(user.tenant) do
+            @recurring_orders = OrderGroup.all.select(&:recurring_order?)
+            @success = true
+            @errors = []
+          end
+        else
+          @success = false
+          @errors << "User not logged in"
+        end
+      rescue StandardError => err
+        @success = false
+        @errors << "An unexpected error occurred: #{err.message}"
+      end
+    end
+
+    def handle_get_main_recurring_orders
+      begin
+        user = current_user
+        if user
+          ActsAsTenant.with_tenant(user.tenant) do
+            @recurring_orders = OrderGroup.where(main_order_group_id: nil).select(&:recurring_order?)
+            @success = true
+            @errors = []
+          end
+        else
+          @success = false
+          @errors << "User not logged in"
+        end
+      rescue StandardError => err
+        @success = false
+        @errors << "An unexpected error occurred: #{err.message}"
+      end
+    end
+
+    def handle_get_non_recurring_orders
+      begin
+        user = current_user
+        if user
+          ActsAsTenant.with_tenant(user.tenant) do
+            @non_recurring_orders = OrderGroup.all.reject(&:recurring_order?)
             @success = true
             @errors = []
           end

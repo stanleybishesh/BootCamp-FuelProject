@@ -33,5 +33,8 @@ module Types
     field :get_all_courier, resolver: Resolvers::Couriers::CourierResolver
     field :get_all_order_groups, resolver: Resolvers::OrderGroups::GetAllOrderGroups
     field :get_all_delivery_orders, resolver: Resolvers::DeliveryOrders::GetAllDeliveryOrders
+    field :get_recurring_orders, resolver: Resolvers::OrderGroups::GetRecurringOrders
+    field :get_main_recurring_orders, resolver: Resolvers::OrderGroups::GetMainRecurringOrders
+    field :get_non_recurring_orders, resolver: Resolvers::OrderGroups::GetNonRecurringOrders
   end
 end
