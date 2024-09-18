@@ -1,31 +1,35 @@
-module OrderGroups
-  class OrderGroupService
+module Transports
+  class TransportService
     attr_reader :params
-    attr_accessor :success, :errors, :order_group, :order_groups
-
+    attr_accessor :success, :errors, :transport, :transports
     def initialize(params = {})
       @params = params
       @success = false
       @errors = []
     end
 
-    def execute_create_order_group
-      handle_create_order_group
+    def execute_create_transport
+      handle_create_transport
       self
     end
 
-    def execute_edit_order_group
-      handle_edit_order_group
+    def execute_update_transport
+      handle_update_transport
       self
     end
 
-    def execute_delete_order_group
-      handle_delete_order_group
+    def execute_delete_transport
+      handle_delete_transport
       self
     end
 
-    def execute_get_all_order_groups
-      handle_get_all_order_groups
+    def execute_get_all_transport
+      handle_get_all_transport
+      self
+    end
+
+    def execute_get_transports_by_vehicle_type(vehicle_type)
+      handle_get_transports_by_vehicle_type(vehicle_type)
       self
     end
 
@@ -39,23 +43,18 @@ module OrderGroups
 
     private
 
-    def handle_create_order_group
+    def handle_create_transport
       begin
         user = current_user
         if user
           ActsAsTenant.with_tenant(user.tenant) do
-            @order_group = OrderGroup.new(order_group_params)
-            if @order_group.save
+            @transport = Transport.new(transport_params)
+            if @transport.save
               @success = true
               @errors = []
-              if @order_group.recurring_order?
-                RecurringOrderJob.perform_async(@order_group.id)
-                @success = true
-                @errors = []
-              end
             else
               @success = false
-              @errors = [ @order_group.errors.full_messages ]
+              @errors = @transport.errors.full_messages
             end
           end
         else
@@ -68,68 +67,79 @@ module OrderGroups
       end
     end
 
-    def handle_edit_order_group
+    def handle_update_transport
       begin
         user = current_user
         if user
           ActsAsTenant.with_tenant(user.tenant) do
-            @order_group = OrderGroup.find(params[:order_group_id])
-            raise ActiveRecord::RecordNotFound, "Order Group not found" if @order_group.nil?
-            if @order_group.update(order_group_params)
+            @transport = Transport.find(params[:transport_id])
+            if @transport.update(transport_params)
               @success = true
               @errors = []
             else
               @success = false
-              @errors = [ @order_group.errors.full_messages ]
+              @errors = @transport.errors.full_messages
             end
           end
         else
           @success = false
           @errors << "User not logged in"
         end
-      rescue ActiveRecord::RecordNotFound => err
-        @success = false
-        @errors << err.message
       rescue StandardError => err
         @success = false
         @errors << "An unexpected error occurred: #{err.message}"
       end
     end
 
-    def handle_delete_order_group
+    def handle_delete_transport
       begin
         user = current_user
         if user
           ActsAsTenant.with_tenant(user.tenant) do
-            @order_group = OrderGroup.find(params[:order_group_id])
-            raise ActiveRecord::RecordNotFound, "Order Group not found" if @order_group.nil?
-            if @order_group.destroy
+            @transport = Transport.find(params[:transport_id])
+            if @transport.destroy
               @success = true
               @errors = []
             else
               @success = false
-              @errors = [ @order_group.errors.full_messages ]
+              @errors = @transport.errors.full_messages
             end
           end
         else
           @success = false
           @errors << "User not logged in"
         end
-      rescue ActiveRecord::RecordNotFound, ActiveRecord::RecordNotDestroyed => err
-        @success = false
-        @errors << err.message
       rescue StandardError => err
         @success = false
         @errors << "An unexpected error occurred: #{err.message}"
       end
     end
 
-    def handle_get_all_order_groups
+    def handle_get_all_transport
       begin
         user = current_user
         if user
           ActsAsTenant.with_tenant(user.tenant) do
-            @order_groups = OrderGroup.all
+            @transports = Transport.all
+            @success = true
+            @errors = []
+          end
+        else
+          @success = false
+          @errors << "User not logged in"
+        end
+      rescue StandardError => err
+        @success = false
+        @errors << "An unexpected error occurred: #{err.message}"
+      end
+    end
+
+    def handle_get_transports_by_vehicle_type(vehicle_type)
+      begin
+        user = current_user
+        if user
+          ActsAsTenant.with_tenant(user.tenant) do
+            @transports = Transport.where(vehicle_type: vehicle_type)
             @success = true
             @errors = []
           end
@@ -147,14 +157,8 @@ module OrderGroups
       params[:current_user]
     end
 
-    def order_group_params
-      ActionController::Parameters.new(params).permit(:tenant_id, :client_id, :venue_id, :start_on, :completed_on, :status, recurring: [ :frequency, :start_date, :end_date ],
-         delivery_order_attributes: [
-          :order_group_id, :source, :vehicle_type, :transport_id, :courier_id,
-           line_items_attributes: [
-             :quantity, :delivery_order_id, :merchandise_id, :merchandise_category_id, :price, :unit
-            ]
-           ])
+    def transport_params
+      ActionController::Parameters.new(params[:transport_info]).permit(:name, :status, :vehicle_type)
     end
   end
 end

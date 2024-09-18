@@ -57,23 +57,20 @@ module Clients
                   @success = true
                   @errors = []
                 else
-                  raise ActiveRecord::RecordNotSaved, "Client saved but no membership created"
                   @success = false
-                  @errors = [ @client.errors.full_messages ]
+                  @errors = [ membership.errors.full_messages ]
                 end
               else
-                raise ActiveRecord::RecordNotSaved, "Client could not be registered"
                 @success = false
                 @errors = [ @client.errors.full_messages ]
               end
             end
           end
         else
-          raise ActiveRecord::RecordNotFound, "User not logged in"
           @success = false
           @errors << "User not logged in"
         end
-      rescue ActiveRecord::RecordNotSaved, ActiveRecord::RecordNotFound => err
+      rescue ActiveRecord::Rollback => err
         @success = false
         @errors << err.message
       rescue StandardError => err
@@ -88,6 +85,7 @@ module Clients
         if user
           ActsAsTenant.with_tenant(user.tenant) do
             membership = Membership.find_by(client_id: params[:client_id])
+            raise ActiveRecord::RecordNotFound, "Client's membership not found" if membership.nil?
             @client = Client.find(membership.client_id)
             if @client
               updated_client = @client.update(client_params)
@@ -95,22 +93,19 @@ module Clients
                 @success = true
                 @errors = []
               else
-                raise ActiveRecord::RecordNotSaved, "Client could not be updated"
                 @success = false
                 @errors = [ @client.errors.full_messages ]
               end
             else
-              raise ActiveRecord::RecordNotFound, "Client not found"
               @success = false
               @errors << "Client does not exist in this tenant"
             end
           end
         else
-          raise ActiveRecord::RecordNotFound, "User not logged in"
           @success = false
           @errors << "User not logged in"
         end
-      rescue ActiveRecord::RecordNotSaved, ActiveRecord::RecordNotFound => err
+      rescue ActiveRecord::RecordNotFound => err
         @success = false
         @errors << err.message
       rescue StandardError => err
@@ -125,24 +120,22 @@ module Clients
         if user
           ActsAsTenant.with_tenant(user.tenant) do
             membership = Membership.find_by(client_id: params[:client_id])
+            raise ActiveRecord::RecordNotFound, "Client's membership not found" if membership.nil?
             @client = Client.find(membership.client_id)
             if @client
               if @client.destroy && membership.destroy
                 @success = true
                 @errors = []
               else
-                raise ActiveRecord::RecordNotDestroyed, "Client could not be deleted"
                 @success = false
                 @errors = [ @client.errors.full_messages ]
               end
             else
-              raise ActiveRecord::RecordNotFound, "Client not found in this tenant"
               @success = false
               @errors << "Client does not exist in this tenant"
             end
           end
         else
-          raise ActiveRecord::RecordNotFound, "User not logged in"
           @success = false
           @errors << "User not logged in"
         end
@@ -166,13 +159,9 @@ module Clients
             @errors = []
           end
         else
-          raise ActiveRecord::RecordNotFound, "User not logged in"
           @success = false
           @errors << "User not logged in"
         end
-      rescue ActiveRecord::RecordNotFound => err
-        @success = false
-        @errors << err.message
       rescue StandardError => err
         @success = false
         @errors << "An unexpected error occurred: #{err.message}"
@@ -185,12 +174,13 @@ module Clients
         if user
           ActsAsTenant.with_tenant(user.tenant) do
             membership = Membership.find_by(client_id: params[:client_id])
+            raise ActiveRecord::RecordNotFound, "Client's membership not found" if membership.nil?
             @client = Client.find(membership.client_id)
+            raise ActiveRecord::RecordNotFound, "Client not found" if @client.nil?
             @success = true
             @errors = []
           end
         else
-          raise ActiveRecord::RecordNotFound, "User not logged in"
           @success = false
           @errors << "User not logged in"
         end

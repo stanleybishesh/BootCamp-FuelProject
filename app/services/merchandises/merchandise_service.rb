@@ -1,7 +1,7 @@
-module OrderGroups
-  class OrderGroupService
+module Merchandises
+  class MerchandiseService
     attr_reader :params
-    attr_accessor :success, :errors, :order_group, :order_groups
+    attr_accessor :success, :errors, :merchandise, :merchandises
 
     def initialize(params = {})
       @params = params
@@ -9,23 +9,28 @@ module OrderGroups
       @errors = []
     end
 
-    def execute_create_order_group
-      handle_create_order_group
+    def execute_create_merchandise
+      handle_create_merchandise
       self
     end
 
-    def execute_edit_order_group
-      handle_edit_order_group
+    def execute_update_merchandise
+      handle_update_merchandise
       self
     end
 
-    def execute_delete_order_group
-      handle_delete_order_group
+    def execute_delete_merchandise
+      handle_delete_merchandise
       self
     end
 
-    def execute_get_all_order_groups
-      handle_get_all_order_groups
+    def execute_get_all_merchandises
+      handle_get_all_merchandises
+      self
+    end
+
+    def execute_get_merchandises_by_category
+      handle_get_merchandises_by_category
       self
     end
 
@@ -39,23 +44,19 @@ module OrderGroups
 
     private
 
-    def handle_create_order_group
+    def handle_create_merchandise
       begin
         user = current_user
         if user
           ActsAsTenant.with_tenant(user.tenant) do
-            @order_group = OrderGroup.new(order_group_params)
-            if @order_group.save
+            merchandise_category = MerchandiseCategory.find(params[:merchandise_category_id])
+            @merchandise = merchandise_category.merchandises.build(params[:merchandise_info].to_h)
+            if @merchandise.save
               @success = true
               @errors = []
-              if @order_group.recurring_order?
-                RecurringOrderJob.perform_async(@order_group.id)
-                @success = true
-                @errors = []
-              end
             else
               @success = false
-              @errors = [ @order_group.errors.full_messages ]
+              @errors = @merchandise.errors.full_messages
             end
           end
         else
@@ -68,68 +69,80 @@ module OrderGroups
       end
     end
 
-    def handle_edit_order_group
+    def handle_update_merchandise
       begin
         user = current_user
         if user
           ActsAsTenant.with_tenant(user.tenant) do
-            @order_group = OrderGroup.find(params[:order_group_id])
-            raise ActiveRecord::RecordNotFound, "Order Group not found" if @order_group.nil?
-            if @order_group.update(order_group_params)
+            @merchandise = Merchandise.find(params[:merchandise_id])
+            if @merchandise.update(merchandise_params)
               @success = true
               @errors = []
             else
               @success = false
-              @errors = [ @order_group.errors.full_messages ]
+              @errors = @merchandise.errors.full_messages
             end
           end
         else
-          @success = false
-          @errors << "User not logged in"
+            @success = false
+            @errors << "User not logged in"
         end
-      rescue ActiveRecord::RecordNotFound => err
-        @success = false
-        @errors << err.message
       rescue StandardError => err
         @success = false
         @errors << "An unexpected error occurred: #{err.message}"
       end
     end
 
-    def handle_delete_order_group
+    def handle_delete_merchandise
       begin
         user = current_user
         if user
           ActsAsTenant.with_tenant(user.tenant) do
-            @order_group = OrderGroup.find(params[:order_group_id])
-            raise ActiveRecord::RecordNotFound, "Order Group not found" if @order_group.nil?
-            if @order_group.destroy
+            @merchandise = Merchandise.find(params[:merchandise_id])
+            if @merchandise.destroy
               @success = true
               @errors = []
             else
               @success = false
-              @errors = [ @order_group.errors.full_messages ]
+              @errors = @merchandise.errors.full_messages
             end
           end
         else
           @success = false
           @errors << "User not logged in"
         end
-      rescue ActiveRecord::RecordNotFound, ActiveRecord::RecordNotDestroyed => err
-        @success = false
-        @errors << err.message
       rescue StandardError => err
         @success = false
         @errors << "An unexpected error occurred: #{err.message}"
       end
     end
 
-    def handle_get_all_order_groups
+    def handle_get_all_merchandises
       begin
         user = current_user
         if user
           ActsAsTenant.with_tenant(user.tenant) do
-            @order_groups = OrderGroup.all
+            @merchandises = Merchandise.all
+            @success = true
+            @errors = []
+          end
+        else
+          @success = false
+          @errors << "User not logged in"
+        end
+      rescue StandardError => err
+        @success = false
+        @errors << "An unexpected error occurred: #{err.message}"
+      end
+    end
+
+    def handle_get_merchandises_by_category
+      begin
+        user = current_user
+        if user
+          ActsAsTenant.with_tenant(user.tenant) do
+            category = MerchandiseCategory.find(params[:merchandise_category_id])
+            @merchandises = category.merchandises
             @success = true
             @errors = []
           end
@@ -147,14 +160,8 @@ module OrderGroups
       params[:current_user]
     end
 
-    def order_group_params
-      ActionController::Parameters.new(params).permit(:tenant_id, :client_id, :venue_id, :start_on, :completed_on, :status, recurring: [ :frequency, :start_date, :end_date ],
-         delivery_order_attributes: [
-          :order_group_id, :source, :vehicle_type, :transport_id, :courier_id,
-           line_items_attributes: [
-             :quantity, :delivery_order_id, :merchandise_id, :merchandise_category_id, :price, :unit
-            ]
-           ])
+    def merchandise_params
+      ActionController::Parameters.new(params).permit(:name, :status, :description, :price, :unit)
     end
   end
 end

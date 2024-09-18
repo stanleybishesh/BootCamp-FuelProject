@@ -6,23 +6,33 @@ module Mutations
       field :token, String, null: false
       field :courier, Types::Couriers::CourierType, null: true
       field :message, String, null: true
+      field :errors, [ String ], null: true
 
       def resolve(login_data:)
-        courier = Courier.find_by(email: login_data.email)
-        if courier
-          ActsAsTenant.with_tenant(courier.tenant) do
-            if courier&.valid_password?(login_data.password)
-              jti = SecureRandom.uuid
-              token = ::JWT.encode({ courier_id: courier.id, jti: jti, exp: 1.day.from_now.to_i, type: "courier" }, "secret", "HS256")
-
-              courier.update(jti: jti)
-              { token: token, courier: courier, message: "You Logged In Successfully" }
-            else
-              raise GraphQL::ExecutionError, "Invalid email or password"
-            end
+        begin
+          courier_service = ::Couriers::CourierService.new(login_data.to_h).execute_courier_login
+          if courier_service.success?
+            {
+              token: courier_service.token,
+              courier: courier_service.courier,
+              message: "Courier signed in successfully",
+              errors: []
+            }
+          else
+            {
+              token: nil,
+              courier: nil,
+              message: "Courier login failed",
+              errors: [ courier_service.errors ]
+            }
           end
-        else
-          raise GraphQL::ExecutionError, "Courier not registered"
+        rescue GraphQL::ExecutionError => err
+          {
+            token: nil,
+            courier: nil,
+            message: "Courier login failed",
+            errors: [ err.message ]
+          }
         end
       end
     end

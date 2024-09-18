@@ -24,7 +24,7 @@ class Mutations::MerchandiseCategories::EditMerchandiseCategory < Mutations::Bas
         end
       end
     else
-      raise GraphQL::ExecutionError, "User not logged in"
+      raise GraphQL::ExecutionError, "Merchandise not found"
     end
   end
 end
