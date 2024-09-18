@@ -20,7 +20,7 @@ module Mutations
         else
           {
             merchandise: nil,
-            errors: merchandise_service.errors,
+            errors: [ merchandise_service.errors ],
             message: "Merchandise update failed"
           }
         end
