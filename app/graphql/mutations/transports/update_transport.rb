@@ -9,7 +9,7 @@ module Mutations
       field :message, String, null: false
 
       def resolve(transport_id:, transport_info:)
-        transport_service = ::Transports::TransportService.new(transport_id: transport_id, transport_info: transport_info.to_h, current_user: current_user).execute_update_transport
+        transport_service = ::Transports::TransportService.new(transport_info.to_h.merge(transport_id: transport_id, current_user: current_user)).execute_update_transport
         if transport_service.success?
           {
             transport: transport_service.transport,

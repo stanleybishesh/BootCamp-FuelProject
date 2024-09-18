@@ -158,7 +158,7 @@ module Transports
     end
 
     def transport_params
-      ActionController::Parameters.new(params[:transport_info]).permit(:name, :status, :vehicle_type)
+      ActionController::Parameters.new(params).permit(:name, :status, :vehicle_type)
     end
   end
 end

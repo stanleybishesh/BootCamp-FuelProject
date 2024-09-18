@@ -15,6 +15,8 @@ module Types
       field :delivery_order, Types::DeliveryOrders::DeliveryOrderType, null: false
       field :client, Types::Clients::ClientType, null: false
       field :venue, Venues::VenueType
+      field :recurring, Types::OrderGroups::RecurringType, null: true
+      field :main_order_group_id, Integer, null: true
     end
   end
 end

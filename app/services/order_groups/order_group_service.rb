@@ -1,7 +1,7 @@
 module OrderGroups
   class OrderGroupService
     attr_reader :params
-    attr_accessor :success, :errors, :order_group, :order_groups
+    attr_accessor :success, :errors, :order_group, :order_groups, :delivery_orders
 
     def initialize(params = {})
       @params = params
@@ -29,6 +29,11 @@ module OrderGroups
       self
     end
 
+    def execute_get_all_delivery_orders
+      handle_get_all_delivery_orders
+      self
+    end
+
     def success?
       @success || @errors.empty?
     end
@@ -48,6 +53,11 @@ module OrderGroups
             if @order_group.save
               @success = true
               @errors = []
+              if @order_group.recurring_order?
+                RecurringOrderJob.perform_async(@order_group.id)
+                @success = true
+                @errors = []
+              end
             else
               @success = false
               @errors = [ @order_group.errors.full_messages ]
@@ -138,12 +148,32 @@ module OrderGroups
       end
     end
 
+    def handle_get_all_delivery_orders
+      begin
+        user = current_user
+        if user
+          ActsAsTenant.with_tenant(user.tenant) do
+            @delivery_orders = DeliveryOrder.all
+            @success = true
+            @errors = []
+          end
+        else
+          @success = false
+          @errors << "User not logged in"
+        end
+      rescue StandardError => err
+        @success = false
+        @errors << "An unexpected error occurred: #{err.message}"
+      end
+    end
+
     def current_user
       params[:current_user]
     end
 
     def order_group_params
       ActionController::Parameters.new(params).permit(:tenant_id, :client_id, :venue_id, :start_on, :completed_on, :status,
+        :main_order_group_id, recurring: [ :frequency, :start_date, :end_date ],
          delivery_order_attributes: [
           :order_group_id, :source, :vehicle_type, :transport_id, :courier_id,
            line_items_attributes: [
