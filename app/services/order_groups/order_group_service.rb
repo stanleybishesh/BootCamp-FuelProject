@@ -49,22 +49,14 @@ module OrderGroups
               @success = true
               @errors = []
             else
-              # raise ActiveRecord::RecordNotSaved, "Order Group failed to create"
               @success = false
               @errors = @order_group.errors.full_messages
             end
           end
         else
-          # raise ActiveRecord::RecordNotFound, "User not logged in"
           @success = false
           @errors << "User not logged in"
         end
-      # rescue ActiveRecord::RecordNotFound => err
-      #   @success = false
-      #   @errors << err.message
-      # rescue ActiveRecord::RecordNotSaved => err
-      #   @success = false
-      #   @errors << err.message
       rescue StandardError => err
         @success = false
         @errors << "An unexpected error occurred: #{err.message}"
