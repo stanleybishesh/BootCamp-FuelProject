@@ -7,13 +7,12 @@ module Resolvers
 
 
       def resolve(vehicle_type:)
-        user = current_user
-        if user
-          ActsAsTenant.with_tenant(user.tenant) do
-            Transport.where(vehicle_type: vehicle_type)
-          end
+        transport_service = ::Transports::TransportService.new(current_user: current_user).execute_get_transports_by_vehicle_type(vehicle_type)
+
+        if transport_service.success?
+          transport_service.transports
         else
-          raise GraphQL::ExecutionError, "User not logged in"
+          raise GraphQL::ExecutionError, transport_service.errors
         end
       end
     end

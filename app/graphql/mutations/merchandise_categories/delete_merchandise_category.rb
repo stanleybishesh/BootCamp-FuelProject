@@ -19,7 +19,7 @@ class Mutations::MerchandiseCategories::DeleteMerchandiseCategory < Mutations::B
         end
       end
     else
-      raise GraphQL::ExecutionError, "User not logged in"
+      raise GraphQL::ExecutionError, "Merchandise not found"
     end
   end
 end

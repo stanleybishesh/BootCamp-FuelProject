@@ -9,31 +9,19 @@ module Mutations
       field :message, String, null: false
 
       def resolve(transport_id:, transport_info:)
-        user = current_user
-        if user
-          ActsAsTenant.with_tenant(user.tenant) do
-            transport = Transport.find(transport_id)
-
-            if transport.nil?
-              raise GraphQL::ExecutionError, "Transport not found"
-            end
-
-            if transport.update(transport_info.to_h)
-              {
-                transport: transport,
-                errors: [],
-                message: "Transport updated successfully"
-              }
-            else
-              {
-                transport: nil,
-                errors: [ transport.errors.full_messages ],
-                message: "Transport could not be updated"
-              }
-            end
-          end
+        transport_service = ::Transports::TransportService.new(transport_id: transport_id, transport_info: transport_info.to_h, current_user: current_user).execute_update_transport
+        if transport_service.success?
+          {
+            transport: transport_service.transport,
+            errors: [],
+            message: "Transport updated successfully"
+          }
         else
-          raise GraphQL::ExecutionError, "User not logged in"
+          {
+            transport: nil,
+            errors: [ transport_service.errors ],
+            message: "Transport update failed"
+          }
         end
       end
     end

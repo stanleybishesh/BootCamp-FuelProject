@@ -52,19 +52,14 @@ module Venues
               @success = true
               @errors = []
             else
-              raise ActiveRecord::RecordNotSaved, "Venue failed to create"
               @success = false
               @errors = [ @venue.errors.full_messages ]
             end
           end
         else
-          raise ActiveRecord::RecordNotFound, "User not logged in"
           @success = false
           @errors << "User not logged in"
         end
-      rescue ActiveRecord::RecordNotSaved => err
-        @success = false
-        @errors << err.message
       rescue ActiveRecord::RecordNotFound => err
         @success = false
         @errors << err.message
@@ -87,20 +82,15 @@ module Venues
               @success = true
               @errors = []
             else
-              raise ActiveRecord::RecordNotSaved, "Venue failed to edit"
               @success = false
               @errors = [ @venue.errors.full_messages ]
             end
           end
         else
-          raise ActiveRecord::RecordNotFound, "User not logged in"
           @success = false
           @errors << "User not logged in"
         end
       rescue ActiveRecord::RecordNotFound => err
-        @success = false
-        @errors << err.message
-      rescue ActiveRecord::RecordNotSaved => err
         @success = false
         @errors << err.message
       rescue StandardError => err
@@ -122,13 +112,11 @@ module Venues
               @success = true
               @errors = []
             else
-              raise ActiveRecord::RecordNotDestroyed, "Venue failed to delete"
               @success = false
               @errors = [ @venue.errors.full_messages ]
             end
           end
         else
-          raise ActiveRecord::RecordNotFound, "User not logged in"
           @success = false
           @errors << "User not logged in"
         end
@@ -154,7 +142,6 @@ module Venues
             @errors = []
           end
         else
-          raise ActiveRecord::RecordNotFound, "User not logged in"
           @success = false
           @errors << "User not logged in"
         end

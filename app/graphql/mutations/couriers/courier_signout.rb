@@ -3,17 +3,30 @@ module Mutations
     class CourierSignout < BaseMutation
       field :success, Boolean, null: true
       field :message, String, null: true
+      field :errors, [ String ], null: true
 
       def resolve
-        courier = current_courier
-        if courier
-          ActsAsTenant.with_tenant(courier.tenant) do
-            new_jti = SecureRandom.uuid
-            courier.update(jti: new_jti)
-            { success: true, message: "Logged Out Successfully!" }
+        begin
+          courier_service = ::Couriers::CourierService.new(current_courier: current_courier).execute_courier_logout
+          if courier_service.success?
+            {
+              success: true,
+              message: "Logged out successfully",
+              errors: []
+            }
+          else
+            {
+              success: false,
+              message: "Logout failed",
+              errors: [ courier_service.errors ]
+            }
           end
-        else
-          raise GraphQL::ExecutionError, "Courier not logged in"
+        rescue GraphQL::ExecutionError => err
+          {
+            success: false,
+            message: "Logout failed",
+            errors: [ err.message ]
+          }
         end
       end
     end

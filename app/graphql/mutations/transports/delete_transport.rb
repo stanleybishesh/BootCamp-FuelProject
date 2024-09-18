@@ -7,24 +7,17 @@ module Mutations
       field :message, String, null: false
 
       def resolve(transport_id:)
-        user = current_user
-        if user
-          ActsAsTenant.with_tenant(user.tenant) do
-          transport = Transport.find(transport_id)
-            if transport.destroy
-              {
-                message: "Transport deleted",
-                errors: []
-              }
-            else
-              {
-                message: "Failed to delete Transport",
-                errors: [ transport.errors.full_messages ]
-              }
-            end
-          end
+        transport_service = ::Transports::TransportService.new(transport_id: transport_id, current_user: current_user).execute_delete_transport
+        if transport_service.success?
+          {
+            message: "Transport deleted successfully",
+            errors: []
+          }
         else
-          raise GraphQL::ExecutionError, "Transport not found"
+            {
+              message: "Transport deletion failed",
+              errors: [ transport_service.errors ]
+            }
         end
       end
     end
