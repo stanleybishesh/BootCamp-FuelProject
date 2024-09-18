@@ -43,20 +43,15 @@ module Users
               @success = true
               @errors = []
             else
-              raise ActiveRecord::ActiveRecordError, "Invalid email or password"
               @success = false
               @errors = [ @user.errors.full_messages ]
             end
           end
         else
-          raise ActiveRecord::RecordNotFound, "User not registered"
           @success = false
           @errors << "User does not exist"
         end
       rescue ActiveRecord::ActiveRecordError => err
-        @success = false
-        @errors << err.message
-      rescue ActiveRecord::RecordNotFound => err
         @success = false
         @errors << err.message
       rescue StandardError => err
@@ -76,13 +71,9 @@ module Users
             @errors=[]
           end
         else
-          raise ActiveRecord::RecordNotFound, "User not logged in"
           @success = false
           @errors << "User not logged in"
         end
-      rescue ActiveRecord::RecordNotFound => err
-        @success = false
-        @errors << err.message
       rescue StandardError => err
         @success = false
         @errors << "An unexpected error occurred: #{err.message}"
