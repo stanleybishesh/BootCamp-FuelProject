@@ -4,12 +4,12 @@ module Mutations
       argument :merchandise_category_id, ID, required: true
       argument :merchandise_info, Types::InputObjects::MakeMerchandiseInputType, required: true
 
-      field :merchandise, Types::Merchandises::MerchandiseType, null: false
+      field :merchandise, Types::Merchandises::MerchandiseType, null: true
       field :errors, [ String ], null: false
       field :message, String, null: true
 
       def resolve(merchandise_category_id:, merchandise_info:)
-        merchandise_service = ::Merchandises::MerchandiseService.new({ merchandise_category_id: merchandise_category_id, merchandise_info: merchandise_info.to_h }.merge(current_user: current_user)).execute_create_merchandise
+        merchandise_service = ::Merchandises::MerchandiseService.new(merchandise_info.to_h.merge(merchandise_category_id: merchandise_category_id, current_user: current_user)).execute_create_merchandise
 
         if merchandise_service.success?
           {

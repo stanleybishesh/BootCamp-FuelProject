@@ -27,6 +27,7 @@ class RecurringOrderJob
       new_order_group = order_group.dup
       new_order_group.start_on = current_date
       new_order_group.completed_on = nil
+      new_order_group.main_order_group_id = order_group.id
 
       if order_group.delivery_order.present?
         new_delivery_order = order_group.delivery_order.dup

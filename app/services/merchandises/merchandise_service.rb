@@ -50,7 +50,7 @@ module Merchandises
         if user
           ActsAsTenant.with_tenant(user.tenant) do
             merchandise_category = MerchandiseCategory.find(params[:merchandise_category_id])
-            @merchandise = merchandise_category.merchandises.build(params[:merchandise_info].to_h)
+            @merchandise = merchandise_category.merchandises.build(merchandise_params)
             if @merchandise.save
               @success = true
               @errors = []
@@ -161,7 +161,7 @@ module Merchandises
     end
 
     def merchandise_params
-      ActionController::Parameters.new(params).permit(:name, :status, :description, :price, :unit)
+      ActionController::Parameters.new(params).permit(:name, :status, :description, :price, :unit, :merchandise_category_id)
     end
   end
 end

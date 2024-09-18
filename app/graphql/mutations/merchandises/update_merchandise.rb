@@ -9,7 +9,7 @@ module Mutations
       field :message, String, null: true
 
       def resolve(merchandise_id:, merchandise_info:)
-        merchandise_service = ::Merchandises::MerchandiseService.new({ merchandise_id: merchandise_id, merchandise_info: merchandise_info.to_h }.merge(current_user: current_user)).execute_update_merchandise
+        merchandise_service = ::Merchandises::MerchandiseService.new(merchandise_info.to_h.merge(merchandise_id: merchandise_id, current_user: current_user)).execute_update_merchandise
 
         if merchandise_service.success?
           {

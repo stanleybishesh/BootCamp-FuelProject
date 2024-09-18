@@ -11,6 +11,8 @@ class OrderGroup < ApplicationRecord
   }
 
   has_one :delivery_order, dependent: :destroy
+  has_many :children_order_groups, class_name: "OrderGroup", foreign_key: "main_order_group_id"
+  belongs_to :main_order_group, class_name: "OrderGroup", optional: true
   belongs_to :client
   belongs_to :venue
   accepts_nested_attributes_for :delivery_order
@@ -20,6 +22,14 @@ class OrderGroup < ApplicationRecord
 
   def recurring_order?
     recurring.present?
+  end
+
+  def main_order_group?
+    main_order_group_id.nil?
+  end
+
+  def child_order_group?
+    main_order_group_id.present?
   end
 
   private
