@@ -100,12 +100,35 @@ module OrderGroups
           ActsAsTenant.with_tenant(user.tenant) do
             @order_group = OrderGroup.find(params[:order_group_id])
             raise ActiveRecord::RecordNotFound, "Order Group not found" if @order_group.nil?
-            if @order_group.update(order_group_params)
-              @success = true
-              @errors = []
+
+            if @order_group.recurring_order?
+              if @order_group.main_order_group_id.nil?
+                @order_group.children_order_groups.each do |child_order|
+                  unless @order_group.child_order_updated?(child_order)
+                    child_order.update(order_group_params)
+                  end
+                  @order_group.update(order_group_params)
+                  @success = true
+                  @errors = []
+                end
+              else
+                if @order_group.update(order_group_params)
+                  @order_group.mark_child_order_as_updated(@order_group)
+                  @success = true
+                  @errors = []
+                else
+                  @success = false
+                  @errors = [ @order_group.errors.full_messages ]
+                end
+              end
             else
-              @success = false
-              @errors = [ @order_group.errors.full_messages ]
+              if @order_group.update(order_group_params)
+                @success = true
+                @errors = []
+              else
+                @success = false
+                @errors = [ @order_group.errors.full_messages ]
+              end
             end
           end
         else
@@ -134,12 +157,6 @@ module OrderGroups
                 @order_group.children_order_groups.each do |child_order|
                   child_order.destroy
                 end
-                @success = true
-                @errors = []
-              else
-                @order_group.destroy
-                @success = true
-                @errors = []
               end
             end
 
@@ -246,6 +263,7 @@ module OrderGroups
         if user
           ActsAsTenant.with_tenant(user.tenant) do
             main_recurring_order = OrderGroup.find_by(id: params[:main_recurring_order_id], main_order_group_id: nil)
+            raise ActiveRecord::RecordNotFound, "Main Order Group does not exist" if main_recurring_order.nil?
             @recurring_orders = main_recurring_order.children_order_groups
             @success = true
             @errors = []
@@ -254,6 +272,9 @@ module OrderGroups
           @success = false
           @errors << "User not logged in"
         end
+      rescue ActiveRecord::RecordNotFound => err
+        @success = false
+        @errors << [ err.message ]
       rescue StandardError => err
         @success = false
         @errors << "An unexpected error occurred: #{err.message}"
@@ -284,7 +305,7 @@ module OrderGroups
     end
 
     def order_group_params
-      ActionController::Parameters.new(params).permit(:tenant_id, :client_id, :venue_id, :start_on, :completed_on, :status,
+      ActionController::Parameters.new(params).permit(:tenant_id, :client_id, :venue_id, :start_on, :completed_on, :status, :manual_update,
         :main_order_group_id, recurring: [ :frequency, :start_date, :end_date ],
          delivery_order_attributes: [
           :order_group_id, :source, :vehicle_type, :transport_id, :courier_id,
