@@ -44,6 +44,11 @@ module OrderGroups
       self
     end
 
+    def execute_get_children_recurring_orders
+      handle_get_children_recurring_orders
+      self
+    end
+
     def execute_get_non_recurring_orders
       handle_get_non_recurring_orders
       self
@@ -123,6 +128,21 @@ module OrderGroups
           ActsAsTenant.with_tenant(user.tenant) do
             @order_group = OrderGroup.find(params[:order_group_id])
             raise ActiveRecord::RecordNotFound, "Order Group not found" if @order_group.nil?
+
+            if @order_group.recurring_order?
+              if @order_group.main_order_group_id.nil?
+                @order_group.children_order_groups.each do |child_order|
+                  child_order.destroy
+                end
+                @success = true
+                @errors = []
+              else
+                @order_group.destroy
+                @success = true
+                @errors = []
+              end
+            end
+
             if @order_group.destroy
               @success = true
               @errors = []
@@ -207,6 +227,26 @@ module OrderGroups
         if user
           ActsAsTenant.with_tenant(user.tenant) do
             @recurring_orders = OrderGroup.where(main_order_group_id: nil).select(&:recurring_order?)
+            @success = true
+            @errors = []
+          end
+        else
+          @success = false
+          @errors << "User not logged in"
+        end
+      rescue StandardError => err
+        @success = false
+        @errors << "An unexpected error occurred: #{err.message}"
+      end
+    end
+
+    def handle_get_children_recurring_orders
+      begin
+        user = current_user
+        if user
+          ActsAsTenant.with_tenant(user.tenant) do
+            main_recurring_order = OrderGroup.find_by(id: params[:main_recurring_order_id], main_order_group_id: nil)
+            @recurring_orders = main_recurring_order.children_order_groups
             @success = true
             @errors = []
           end
