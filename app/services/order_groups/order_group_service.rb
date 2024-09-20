@@ -1,7 +1,7 @@
 module OrderGroups
   class OrderGroupService
     attr_reader :params
-    attr_accessor :success, :errors, :order_group, :order_groups, :client
+    attr_accessor :success, :errors, :order_group, :order_groups, :client, :courier
 
     def initialize(params = {})
       @params = params
@@ -45,7 +45,22 @@ module OrderGroups
         if user
           ActsAsTenant.with_tenant(user.tenant) do
             @order_group = OrderGroup.new(order_group_params)
+
+            delivery_order_params = params[:delivery_order_attributes] || {}
+
+            if delivery_order_params.present?
+              @order_group.build_delivery_order(delivery_order_params)
+            end
+
             if @order_group.save
+              @client = Client.find_by(id: order_group_params[:client_id])
+              @courier = Courier.find_by(id: delivery_order_params[:courier_id])
+              if @courier
+                CreateOrderGroupMailer.courier_order_group_created_email(@courier, @order_group).deliver_later
+              end
+              if @client
+                CreateOrderGroupMailer.client_order_group_created_email(@client, @order_group).deliver_later
+              end
               @success = true
               @errors = []
             else
@@ -154,14 +169,40 @@ module OrderGroups
       params[:current_user]
     end
 
+    # def order_group_params
+    #   ActionController::Parameters.new(params).permit(:tenant_id, :client_id, :venue_id, :start_on, :completed_on, :status,
+    #      delivery_order_attributes: [
+    #       :order_group_id, :source, :vehicle_type, :transport_id, :courier_id,
+    #        line_items_attributes: [
+    #          :quantity, :delivery_order_id, :merchandise_id, :merchandise_category_id, :price, :unit
+    #         ]
+    #        ])
+    # end
+
     def order_group_params
-      ActionController::Parameters.new(params).permit(:tenant_id, :client_id, :venue_id, :start_on, :completed_on, :status,
-         delivery_order_attributes: [
-          :order_group_id, :source, :vehicle_type, :transport_id, :courier_id,
-           line_items_attributes: [
-             :quantity, :delivery_order_id, :merchandise_id, :merchandise_category_id, :price, :unit
-            ]
-           ])
+      ActionController::Parameters.new(params).permit(
+        :tenant_id,
+        :client_id,
+        :venue_id,
+        :start_on,
+        :completed_on,
+        :status,
+        delivery_orders_attributes: [
+          :order_group_id,
+          :source,
+          :vehicle_type,
+          :transport_id,
+          :courier_id,
+          line_items_attributes: [
+            :quantity,
+            :delivery_order_id,
+            :merchandise_id,
+            :merchandise_category_id,
+            :price,
+            :unit
+          ]
+        ]
+      )
     end
   end
 end
