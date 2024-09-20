@@ -1,7 +1,7 @@
 namespace :users do
   desc "Import users from a CSV file"
   task import: :environment do
-    file_path = Rails.root.join("users_export.csv")
+    file_path = Rails.root.join("user.csv")
     puts "Importing users from #{file_path}..."
 
     begin
