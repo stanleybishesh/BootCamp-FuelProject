@@ -51,9 +51,6 @@ module Users
           @success = false
           @errors << "User does not exist"
         end
-      rescue ActiveRecord::ActiveRecordError => err
-        @success = false
-        @errors << err.message
       rescue StandardError => err
         @success = false
         @errors << "An unexpected error occurred: #{err.message}"
