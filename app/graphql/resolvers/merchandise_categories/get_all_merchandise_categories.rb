@@ -1,14 +1,13 @@
 class Resolvers::MerchandiseCategories::GetAllMerchandiseCategories < Resolvers::BaseResolver
-  type [ Types::MerchandiseCategories::MerchandiseCategoryType ], null: false
+  type [Types::MerchandiseCategories::MerchandiseCategoryType], null: false
 
   def resolve
-    user = current_user
-    if user
-      ActsAsTenant.with_tenant(user.tenant) do
-        MerchandiseCategory.all
-      end
+    merchandise_category_service = ::MerchandiseCategories::MerchandiseCategoryService.new(current_user: current_user).execute_get_all_merchandise_categories
+
+    if merchandise_category_service.success?
+      merchandise_category_service.merchandise_categories
     else
-      raise GraphQL::ExecutionError, "User not logged in"
+      raise GraphQL::ExecutionError, merchandise_category_service.errors
     end
   end
 end

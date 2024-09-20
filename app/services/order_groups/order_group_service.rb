@@ -1,7 +1,7 @@
 module OrderGroups
   class OrderGroupService
     attr_reader :params
-    attr_accessor :success, :errors, :order_group, :order_groups, :delivery_orders
+    attr_accessor :success, :errors, :order_group, :order_groups, :delivery_orders, :recurring_orders, :non_recurring_orders
 
     def initialize(params = {})
       @params = params
@@ -31,6 +31,26 @@ module OrderGroups
 
     def execute_get_all_delivery_orders
       handle_get_all_delivery_orders
+      self
+    end
+
+    def execute_get_recurring_orders
+      handle_get_recurring_orders
+      self
+    end
+
+    def execute_get_main_recurring_orders
+      handle_get_main_recurring_orders
+      self
+    end
+
+    def execute_get_children_recurring_orders
+      handle_get_children_recurring_orders
+      self
+    end
+
+    def execute_get_non_recurring_orders
+      handle_get_non_recurring_orders
       self
     end
 
@@ -80,12 +100,35 @@ module OrderGroups
           ActsAsTenant.with_tenant(user.tenant) do
             @order_group = OrderGroup.find(params[:order_group_id])
             raise ActiveRecord::RecordNotFound, "Order Group not found" if @order_group.nil?
-            if @order_group.update(order_group_params)
-              @success = true
-              @errors = []
+
+            if @order_group.recurring_order?
+              if @order_group.main_order_group_id.nil?
+                @order_group.children_order_groups.each do |child_order|
+                  unless @order_group.child_order_updated?(child_order)
+                    child_order.update(order_group_params)
+                  end
+                  @order_group.update(order_group_params)
+                  @success = true
+                  @errors = []
+                end
+              else
+                if @order_group.update(order_group_params)
+                  @order_group.mark_child_order_as_updated(@order_group)
+                  @success = true
+                  @errors = []
+                else
+                  @success = false
+                  @errors = [ @order_group.errors.full_messages ]
+                end
+              end
             else
-              @success = false
-              @errors = [ @order_group.errors.full_messages ]
+              if @order_group.update(order_group_params)
+                @success = true
+                @errors = []
+              else
+                @success = false
+                @errors = [ @order_group.errors.full_messages ]
+              end
             end
           end
         else
@@ -108,6 +151,15 @@ module OrderGroups
           ActsAsTenant.with_tenant(user.tenant) do
             @order_group = OrderGroup.find(params[:order_group_id])
             raise ActiveRecord::RecordNotFound, "Order Group not found" if @order_group.nil?
+
+            if @order_group.recurring_order?
+              if @order_group.main_order_group_id.nil?
+                @order_group.children_order_groups.each do |child_order|
+                  child_order.destroy
+                end
+              end
+            end
+
             if @order_group.destroy
               @success = true
               @errors = []
@@ -167,12 +219,93 @@ module OrderGroups
       end
     end
 
+    def handle_get_recurring_orders
+      begin
+        user = current_user
+        if user
+          ActsAsTenant.with_tenant(user.tenant) do
+            @recurring_orders = OrderGroup.all.select(&:recurring_order?)
+            @success = true
+            @errors = []
+          end
+        else
+          @success = false
+          @errors << "User not logged in"
+        end
+      rescue StandardError => err
+        @success = false
+        @errors << "An unexpected error occurred: #{err.message}"
+      end
+    end
+
+    def handle_get_main_recurring_orders
+      begin
+        user = current_user
+        if user
+          ActsAsTenant.with_tenant(user.tenant) do
+            @recurring_orders = OrderGroup.where(main_order_group_id: nil).select(&:recurring_order?)
+            @success = true
+            @errors = []
+          end
+        else
+          @success = false
+          @errors << "User not logged in"
+        end
+      rescue StandardError => err
+        @success = false
+        @errors << "An unexpected error occurred: #{err.message}"
+      end
+    end
+
+    def handle_get_children_recurring_orders
+      begin
+        user = current_user
+        if user
+          ActsAsTenant.with_tenant(user.tenant) do
+            main_recurring_order = OrderGroup.find_by(id: params[:main_recurring_order_id], main_order_group_id: nil)
+            raise ActiveRecord::RecordNotFound, "Main Order Group does not exist" if main_recurring_order.nil?
+            @recurring_orders = main_recurring_order.children_order_groups
+            @success = true
+            @errors = []
+          end
+        else
+          @success = false
+          @errors << "User not logged in"
+        end
+      rescue ActiveRecord::RecordNotFound => err
+        @success = false
+        @errors << [ err.message ]
+      rescue StandardError => err
+        @success = false
+        @errors << "An unexpected error occurred: #{err.message}"
+      end
+    end
+
+    def handle_get_non_recurring_orders
+      begin
+        user = current_user
+        if user
+          ActsAsTenant.with_tenant(user.tenant) do
+            @non_recurring_orders = OrderGroup.all.reject(&:recurring_order?)
+            @success = true
+            @errors = []
+          end
+        else
+          @success = false
+          @errors << "User not logged in"
+        end
+      rescue StandardError => err
+        @success = false
+        @errors << "An unexpected error occurred: #{err.message}"
+      end
+    end
+
     def current_user
       params[:current_user]
     end
 
     def order_group_params
-      ActionController::Parameters.new(params).permit(:tenant_id, :client_id, :venue_id, :start_on, :completed_on, :status,
+      ActionController::Parameters.new(params).permit(:tenant_id, :client_id, :venue_id, :start_on, :completed_on, :status, :manual_update,
         :main_order_group_id, recurring: [ :frequency, :start_date, :end_date ],
          delivery_order_attributes: [
           :order_group_id, :source, :vehicle_type, :transport_id, :courier_id,
