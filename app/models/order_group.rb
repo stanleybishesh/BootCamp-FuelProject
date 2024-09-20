@@ -32,6 +32,14 @@ class OrderGroup < ApplicationRecord
     main_order_group_id.present?
   end
 
+  def child_order_updated?(child_order)
+    child_order.manual_update
+  end
+
+  def mark_child_order_as_updated(child_order)
+    child_order.update(manual_update: true)
+  end
+
   private
 
   def set_default_start_on
