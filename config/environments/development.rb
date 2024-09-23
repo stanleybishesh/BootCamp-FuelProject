@@ -82,4 +82,19 @@ Rails.application.configure do
   config.action_mailer.default_url_options = { host: "localhost", port: 3001 }
 
   config.hosts << /.*\.ngrok-free\.app/
+
+  config.action_mailer.raise_delivery_errors = true
+  config.action_mailer.perform_deliveries = true
+  config.action_mailer.delivery_method = :smtp
+  config.action_mailer.smtp_settings = {
+  address:              "smtp.gmail.com",
+  port:                  587,
+  domain:               "localhost",
+  user_name:            "thapaabipinn@gmail.com",
+  password:             "xvpq myyd ciaq fmoc",
+  authentication:       "plain",
+  enable_starttls_auto: true,
+  open_timeout: 300,
+  read_timeout: 300
+}
 end
