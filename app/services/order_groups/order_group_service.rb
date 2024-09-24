@@ -212,8 +212,8 @@ module OrderGroups
           ActsAsTenant.with_tenant(user.tenant) do
             @order_group = OrderGroup.find(params[:order_group_id])
             raise ActiveRecord::RecordNotFound, "Order Group not found" if @order_group.nil?
-            @order_group.status = "delivered"
-            if @order_group.status == "delivered"
+            @order_group.update(status: "delivered")
+            if @order_group.save
               @success = true
               @errors = []
             else
@@ -238,8 +238,8 @@ module OrderGroups
           ActsAsTenant.with_tenant(user.tenant) do
             @order_group = OrderGroup.find(params[:order_group_id])
             raise ActiveRecord::RecordNotFound, "Order Group not found" if @order_group.nil?
-            @order_group.status = "cancelled"
-            if @order_group.status == "cancelled"
+            @order_group.update(status: "cancelled")
+            if @order_group.save
               @success = true
               @errors = []
             else
