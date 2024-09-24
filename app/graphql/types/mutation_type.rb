@@ -25,5 +25,7 @@ module Types
     field :create_order_group, mutation: Mutations::OrderGroups::CreateOrderGroup
     field :edit_order_group, mutation: Mutations::OrderGroups::EditOrderGroup
     field :delete_order_group, mutation: Mutations::OrderGroups::DeleteOrderGroup
+    field :export_users, mutation: Mutations::Users::ExportUsers
+    field :import_users, mutation: Mutations::Users::ImportUsers
   end
 end

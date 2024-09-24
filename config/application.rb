@@ -36,5 +36,6 @@ module FuelPanda
     # This also configures session_options for use below
     config.middleware.use ActionDispatch::Cookies
     config.middleware.use ActionDispatch::Session::CookieStore
+    config.middleware.use ApolloUploadServer::Middleware
   end
 end
