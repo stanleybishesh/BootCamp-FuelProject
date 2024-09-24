@@ -24,6 +24,16 @@ module OrderGroups
       self
     end
 
+    def execute_change_status_to_delivered
+      change_status_to_delivered
+      self
+    end
+
+    def execute_change_status_to_cancelled
+      change_status_to_cancelled
+      self
+    end
+
     def execute_get_all_order_groups
       handle_get_all_order_groups
       self
@@ -187,6 +197,58 @@ module OrderGroups
           @errors << "User not logged in"
         end
       rescue ActiveRecord::RecordNotFound, ActiveRecord::RecordNotDestroyed => err
+        @success = false
+        @errors << err.message
+      rescue StandardError => err
+        @success = false
+        @errors << "An unexpected error occurred: #{err.message}"
+      end
+    end
+
+    def change_status_to_delivered
+      begin
+        user = current_user
+        if user
+          ActsAsTenant.with_tenant(user.tenant) do
+            @order_group = OrderGroup.find(params[:order_group_id])
+            raise ActiveRecord::RecordNotFound, "Order Group not found" if @order_group.nil?
+            @order_group.status = "delivered"
+            if @order_group.status == "delivered"
+              @success = true
+              @errors = []
+            else
+              @success = false
+              @errors = [ @order_group.errors.full_messages ]
+            end
+          end
+        end
+      rescue ActiveRecord::RecordNotFound => err
+        @success = false
+        @errors << err.message
+      rescue StandardError => err
+        @success = false
+        @errors << "An unexpected error occurred: #{err.message}"
+      end
+    end
+
+    def change_status_to_cancelled
+      begin
+        user = current_user
+        if user
+          ActsAsTenant.with_tenant(user.tenant) do
+            @order_group = OrderGroup.find(params[:order_group_id])
+            raise ActiveRecord::RecordNotFound, "Order Group not found" if @order_group.nil?
+            @order_group.status = "cancelled"
+            if @order_group.status == "cancelled"
+              @success = true
+              @errors = []
+            else
+              @success = false
+              @errors = [ @order_group.errors.full_messages ]
+            end
+          end
+        end
+      rescue ActiveRecord::RecordNotFound => err
         @success = false
         @errors << err.message
       rescue StandardError => err

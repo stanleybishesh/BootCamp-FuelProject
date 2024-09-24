@@ -25,5 +25,7 @@ module Types
     field :create_order_group, mutation: Mutations::OrderGroups::CreateOrderGroup
     field :edit_order_group, mutation: Mutations::OrderGroups::EditOrderGroup
     field :delete_order_group, mutation: Mutations::OrderGroups::DeleteOrderGroup
+    field :change_status_to_delivered, mutation: Mutations::OrderGroups::ChangeStatusToDelivered
+    field :change_status_to_cancelled, mutation: Mutations::OrderGroups::ChangeStatusToCancelled
   end
 end
