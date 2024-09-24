@@ -1,7 +1,7 @@
 module OrderGroups
   class OrderGroupService
     attr_reader :params
-    attr_accessor :success, :errors, :order_group, :order_groups, :delivery_orders, :recurring_orders, :non_recurring_orders
+    attr_accessor :success, :errors, :order_group, :order_groups, :delivery_orders, :recurring_orders, :non_recurring_orders, :client, :courier
 
     def initialize(params = {})
       @params = params
@@ -70,7 +70,22 @@ module OrderGroups
         if user
           ActsAsTenant.with_tenant(user.tenant) do
             @order_group = OrderGroup.new(order_group_params)
+
+            delivery_order_params = params[:delivery_order_attributes] || {}
+
+            if delivery_order_params.present?
+              @order_group.build_delivery_order(delivery_order_params)
+            end
+
             if @order_group.save
+              @client = Client.find_by(id: order_group_params[:client_id])
+              @courier = Courier.find_by(id: delivery_order_params[:courier_id])
+              if @courier
+                CreateOrderGroupMailer.courier_order_group_created_email(@courier, @order_group).deliver_later
+              end
+              if @client
+                CreateOrderGroupMailer.client_order_group_created_email(@client, @order_group).deliver_later
+              end
               @success = true
               @errors = []
               if @order_group.recurring_order?
@@ -80,7 +95,7 @@ module OrderGroups
               end
             else
               @success = false
-              @errors = [ @order_group.errors.full_messages ]
+              @errors = @order_group.errors.full_messages
             end
           end
         else
@@ -149,7 +164,7 @@ module OrderGroups
         user = current_user
         if user
           ActsAsTenant.with_tenant(user.tenant) do
-            @order_group = OrderGroup.find(params[:order_group_id])
+            @order_group = OrderGroup.find_by(id: params[:order_group_id])
             raise ActiveRecord::RecordNotFound, "Order Group not found" if @order_group.nil?
 
             if @order_group.recurring_order?
@@ -160,9 +175,13 @@ module OrderGroups
               end
             end
 
+
+            @client = @order_group.client
             if @order_group.destroy
               @success = true
               @errors = []
+              DeleteOrderGroupMailer.order_group_deleted_email(@client).deliver_later
+
             else
               @success = false
               @errors = [ @order_group.errors.full_messages ]
@@ -305,8 +324,7 @@ module OrderGroups
     end
 
     def order_group_params
-      ActionController::Parameters.new(params).permit(:tenant_id, :client_id, :venue_id, :start_on, :completed_on, :status, :manual_update,
-        :main_order_group_id, recurring: [ :frequency, :start_date, :end_date ],
+      ActionController::Parameters.new(params).permit(:tenant_id, :client_id, :venue_id, :start_on, :completed_on, :status,
          delivery_order_attributes: [
           :order_group_id, :source, :vehicle_type, :transport_id, :courier_id,
            line_items_attributes: [
