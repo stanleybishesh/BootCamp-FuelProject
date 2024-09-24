@@ -6,7 +6,7 @@ class CreateOrderGroupMailer < ApplicationMailer
     mail(
       to: @client.email,
       subject: "Order Group Created",
-      from: "thapaabipinn@gmail.com"
+      from: "bishesh.shrestha@fleetpanda.com"
     ) do |format|
       format.html { render html: generate_client_email.html_safe }
     end
@@ -19,7 +19,7 @@ class CreateOrderGroupMailer < ApplicationMailer
     mail(
       to: @courier.email,
       subject: "New Delivery Order Assigned",
-      from: "thapaabipinn@gmail.com"
+      from: "bishesh.shrestha@fleetpanda.com"
     ) do |format|
       format.html { render html: generate_courier_email.html_safe }
     end

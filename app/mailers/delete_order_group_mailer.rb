@@ -7,7 +7,7 @@ class DeleteOrderGroupMailer < ApplicationMailer
     mail(
       to: @client.email,
       subject: "Order Group Deleted",
-      from: "thapaabipinn@gmail.com"
+      from: "bishesh.shrestha@fleetpanda.com"
     ) do |format|
       format.html { render html: generate_html_email.html_safe }
     end

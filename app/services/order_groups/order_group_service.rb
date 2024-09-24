@@ -70,12 +70,7 @@ module OrderGroups
         if user
           ActsAsTenant.with_tenant(user.tenant) do
             @order_group = OrderGroup.new(order_group_params)
-
             delivery_order_params = params[:delivery_order_attributes] || {}
-
-            if delivery_order_params.present?
-              @order_group.build_delivery_order(delivery_order_params)
-            end
 
             if @order_group.save
               @client = Client.find_by(id: order_group_params[:client_id])
