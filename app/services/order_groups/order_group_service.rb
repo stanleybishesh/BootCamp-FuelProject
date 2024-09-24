@@ -319,7 +319,8 @@ module OrderGroups
     end
 
     def order_group_params
-      ActionController::Parameters.new(params).permit(:tenant_id, :client_id, :venue_id, :start_on, :completed_on, :status,
+      ActionController::Parameters.new(params).permit(:tenant_id, :client_id, :venue_id, :start_on, :completed_on, :status, :manual_update,
+        :main_order_group_id, recurring: [ :frequency, :start_date, :end_date ],
          delivery_order_attributes: [
           :order_group_id, :source, :vehicle_type, :transport_id, :courier_id,
            line_items_attributes: [
