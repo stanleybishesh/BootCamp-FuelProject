@@ -1,5 +1,6 @@
 class OrderGroup < ApplicationRecord
-  after_initialize :set_default_start_on, :set_default_status, if: :new_record?
+  after_initialize :set_default_start_on, if: :new_record?
+  before_save :set_default_status, :set_default_completed_on
 
   validates :recurring, presence: true, if: :recurring_order?
 
@@ -47,6 +48,18 @@ class OrderGroup < ApplicationRecord
   end
 
   def set_default_status
-    self.status ||= "pending"
+    if self.status != "delivered" && self.status != "cancelled"
+      if delivery_order&.courier_id.nil?
+        self.status = "pending"
+      else
+        self.status = "processing"
+      end
+    end
+  end
+
+  def set_default_completed_on
+    if status_changed? && status == "delivered"
+      self.completed_on = DateTime.current
+    end
   end
 end

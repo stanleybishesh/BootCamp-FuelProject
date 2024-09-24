@@ -13,7 +13,7 @@ module Types
       field :updated_at, GraphQL::Types::ISO8601DateTime, null: false
       field :line_items, [ Types::LineItems::LineItemType ], null: false
       field :transport, Transports::TransportType, null: false
-      field :courier, Couriers::CourierType, null: false
+      field :courier, Couriers::CourierType, null: true
     end
   end
 end
