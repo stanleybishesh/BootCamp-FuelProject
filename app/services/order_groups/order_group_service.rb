@@ -186,7 +186,7 @@ module OrderGroups
         user = current_user
         if user
           ActsAsTenant.with_tenant(user.tenant) do
-            @order_groups = OrderGroup.all
+            @order_groups = OrderGroup.where(main_order_group_id: nil)
             @success = true
             @errors = []
           end
