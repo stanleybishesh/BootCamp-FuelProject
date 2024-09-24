@@ -9,7 +9,7 @@ module Resolvers
         if merchandise_service.success?
           merchandise_service.merchandises
         else
-          raise GraphQL::ExecutionError, service.errors
+          raise GraphQL::ExecutionError, merchandise_service.errors
         end
       end
     end

@@ -60,14 +60,15 @@ gem "graphql", "~> 2.3", ">= 2.3.14"
 gem "graphiql-rails", group: :development
 
 gem "devise", "~> 4.9", ">= 4.9.4"
-gem 'devise-jwt', '~> 0.12.1'
+gem "devise-jwt", "~> 0.12.1"
 gem "jsonapi-serializer"
 # gem 'jwt', '~> 1.5', '>= 1.5.4'
 gem "bcrypt", "~> 3.1.20"
 gem "rack-cors"
-gem 'acts_as_tenant', '~> 1.0', '>= 1.0.1'
-gem 'request_store', '~> 1.7'
-
-gem 'sidekiq', '~> 7.3', '>= 7.3.2'
-gem 'sidekiq-scheduler', '~> 5.0', '>= 5.0.6'
+gem "acts_as_tenant", "~> 1.0", ">= 1.0.1"
+gem "request_store", "~> 1.7"
 gem 'csv'
+gem "sidekiq", "~> 7.3", ">= 7.3.2"
+gem "sidekiq-scheduler", "~> 5.0", ">= 5.0.6"
+gem "rspec-rails", "~> 7.0", ">= 7.0.1"
+gem "dotenv", "~> 3.1"
