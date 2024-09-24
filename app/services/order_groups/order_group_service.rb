@@ -212,8 +212,12 @@ module OrderGroups
           ActsAsTenant.with_tenant(user.tenant) do
             @order_group = OrderGroup.find(params[:order_group_id])
             raise ActiveRecord::RecordNotFound, "Order Group not found" if @order_group.nil?
-            @order_group.update(status: "delivered")
-            if @order_group.save
+            if @order_group.update(status: "delivered")
+              if @order_group.recurring_order?
+                @order_group.children_order_groups.each do |child_order|
+                  child_order.update(status: "delivered")
+                end
+              end
               @success = true
               @errors = []
             else
@@ -238,8 +242,12 @@ module OrderGroups
           ActsAsTenant.with_tenant(user.tenant) do
             @order_group = OrderGroup.find(params[:order_group_id])
             raise ActiveRecord::RecordNotFound, "Order Group not found" if @order_group.nil?
-            @order_group.update(status: "cancelled")
-            if @order_group.save
+            if @order_group.update(status: "cancelled")
+              if @order_group.recurring_order?
+                @order_group.children_order_groups.each do |child_order|
+                  child_order.update(status: "cancelled")
+                end
+              end
               @success = true
               @errors = []
             else
@@ -281,7 +289,7 @@ module OrderGroups
         user = current_user
         if user
           ActsAsTenant.with_tenant(user.tenant) do
-            @delivery_orders = DeliveryOrder.all
+            @delivery_orders = OrderGroup.joins(:delivery_order).where(main_order_group_id: nil)
             @success = true
             @errors = []
           end

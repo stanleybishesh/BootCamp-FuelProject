@@ -1,5 +1,5 @@
 class Resolvers::DeliveryOrders::GetAllDeliveryOrders < Resolvers::BaseResolver
-  type [ Types::DeliveryOrders::DeliveryOrderType ], null: false
+  type [ Types::OrderGroups::OrderGroupType ], null: false
 
   def resolve
     begin
