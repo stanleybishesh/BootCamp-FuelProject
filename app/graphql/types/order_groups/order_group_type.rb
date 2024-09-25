@@ -7,7 +7,7 @@ module Types
       field :tenant_id, Integer
       field :client_id, Integer
       field :venue_id, Integer
-      field :start_on, GraphQL::Types::ISO8601Date, null: true
+      field :start_on, GraphQL::Types::ISO8601DateTime, null: true
       field :completed_on, GraphQL::Types::ISO8601DateTime, null: true
       field :status, String
       field :created_at, GraphQL::Types::ISO8601DateTime, null: false
