@@ -44,7 +44,7 @@ class OrderGroup < ApplicationRecord
   private
 
   def set_default_start_on
-    self.start_on ||= DateTime.now
+    self.start_on ||= DateTime.current
   end
 
   def set_default_status
