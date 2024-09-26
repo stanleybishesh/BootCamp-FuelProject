@@ -12,16 +12,11 @@ class GraphqlController < ApplicationController
     operation_name = params[:operationName]
 
     current_entity = current_entity_from_token
-    current_tenant = ActsAsTenant.current_tenant
 
     context = {
       current_user: current_entity.is_a?(User) ? current_entity : nil,
       current_courier: current_entity.is_a?(Courier) ? current_entity : nil,
-      current_tenant: current_tenant,
       headers: request.headers
-
-      # current_user: current_user_from_token,
-      # current_courier: current_courier_from_token
     }
     result = FuelPandaSchema.execute(query, variables: variables, context: context, operation_name: operation_name)
     render json: result
