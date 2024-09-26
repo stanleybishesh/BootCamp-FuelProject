@@ -11,8 +11,8 @@ module Users
         user.assign_attributes(
           name: user_data["name"],
           tenant_id: user_data["tenant_id"],
-          jti: user_data["jti"],
-          password: SecureRandom.hex(8)
+          # jti: user_data["jti"],
+          password: user_data["password"]
         )
 
         if user.save
