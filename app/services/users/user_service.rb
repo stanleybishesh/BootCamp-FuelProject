@@ -61,12 +61,10 @@ module Users
       begin
         @user = current_user
         if @user
-          ActsAsTenant.with_tenant(@user.tenant) do
-            new_jti = SecureRandom.uuid
-            @user.update(jti: new_jti)
-            @success = true
-            @errors=[]
-          end
+          new_jti = SecureRandom.uuid
+          @user.update(jti: new_jti)
+          @success = true
+          @errors=[]
         else
           @success = false
           @errors << "User not logged in"

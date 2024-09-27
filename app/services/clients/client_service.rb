@@ -48,22 +48,20 @@ module Clients
       begin
         user = current_user
         if user
-          ActsAsTenant.with_tenant(user.tenant) do
-            ActiveRecord::Base.transaction do
-              @client = Client.new(client_params)
-              if @client.save
-                membership = Membership.new(client_id: @client.id)
-                if membership.save
-                  @success = true
-                  @errors = []
-                else
-                  @success = false
-                  @errors = [ membership.errors.full_messages ]
-                end
+          ActiveRecord::Base.transaction do
+            @client = Client.new(client_params)
+            if @client.save
+              membership = Membership.new(client_id: @client.id)
+              if membership.save
+                @success = true
+                @errors = []
               else
                 @success = false
-                @errors = [ @client.errors.full_messages ]
+                @errors = [ membership.errors.full_messages ]
               end
+            else
+              @success = false
+              @errors = [ @client.errors.full_messages ]
             end
           end
         else
@@ -83,23 +81,21 @@ module Clients
       begin
         user = current_user
         if user
-          ActsAsTenant.with_tenant(user.tenant) do
-            membership = Membership.find_by(client_id: params[:client_id])
-            raise ActiveRecord::RecordNotFound, "Client's membership not found" if membership.nil?
-            @client = Client.find(membership.client_id)
-            if @client
-              updated_client = @client.update(client_params)
-              if updated_client
-                @success = true
-                @errors = []
-              else
-                @success = false
-                @errors = [ @client.errors.full_messages ]
-              end
+          membership = Membership.find_by(client_id: params[:client_id])
+          raise ActiveRecord::RecordNotFound, "Client's membership not found" if membership.nil?
+          @client = Client.find(membership.client_id)
+          if @client
+            updated_client = @client.update(client_params)
+            if updated_client
+              @success = true
+              @errors = []
             else
               @success = false
-              @errors << "Client does not exist in this tenant"
+              @errors = [ @client.errors.full_messages ]
             end
+          else
+            @success = false
+            @errors << "Client does not exist in this tenant"
           end
         else
           @success = false
@@ -118,22 +114,20 @@ module Clients
       begin
         user = current_user
         if user
-          ActsAsTenant.with_tenant(user.tenant) do
-            membership = Membership.find_by(client_id: params[:client_id])
-            raise ActiveRecord::RecordNotFound, "Client's membership not found" if membership.nil?
-            @client = Client.find(membership.client_id)
-            if @client
-              if @client.destroy && membership.destroy
-                @success = true
-                @errors = []
-              else
-                @success = false
-                @errors = [ @client.errors.full_messages ]
-              end
+          membership = Membership.find_by(client_id: params[:client_id])
+          raise ActiveRecord::RecordNotFound, "Client's membership not found" if membership.nil?
+          @client = Client.find(membership.client_id)
+          if @client
+            if @client.destroy && membership.destroy
+              @success = true
+              @errors = []
             else
               @success = false
-              @errors << "Client does not exist in this tenant"
+              @errors = [ @client.errors.full_messages ]
             end
+          else
+            @success = false
+            @errors << "Client does not exist in this tenant"
           end
         else
           @success = false
@@ -152,12 +146,10 @@ module Clients
       begin
         user = current_user
         if user
-          ActsAsTenant.with_tenant(user.tenant) do
-            memberships = Membership.all
-            @clients = Client.where(id: memberships.select(:client_id))
-            @success = true
-            @errors = []
-          end
+          memberships = Membership.all
+          @clients = Client.where(id: memberships.select(:client_id))
+          @success = true
+          @errors = []
         else
           @success = false
           @errors << "User not logged in"
@@ -172,14 +164,12 @@ module Clients
       begin
         user = current_user
         if user
-          ActsAsTenant.with_tenant(user.tenant) do
-            membership = Membership.find_by(client_id: params[:client_id])
-            raise ActiveRecord::RecordNotFound, "Client's membership not found" if membership.nil?
-            @client = Client.find(membership.client_id)
-            raise ActiveRecord::RecordNotFound, "Client not found" if @client.nil?
-            @success = true
-            @errors = []
-          end
+          membership = Membership.find_by(client_id: params[:client_id])
+          raise ActiveRecord::RecordNotFound, "Client's membership not found" if membership.nil?
+          @client = Client.find(membership.client_id)
+          raise ActiveRecord::RecordNotFound, "Client not found" if @client.nil?
+          @success = true
+          @errors = []
         else
           @success = false
           @errors << "User not logged in"

@@ -12,14 +12,24 @@ class GraphqlController < ApplicationController
     operation_name = params[:operationName]
 
     current_entity = current_entity_from_token
+    current_tenant = current_entity.tenant if current_entity.respond_to?(:tenant)
 
     context = {
       current_user: current_entity.is_a?(User) ? current_entity : nil,
       current_courier: current_entity.is_a?(Courier) ? current_entity : nil,
       headers: request.headers
     }
-    result = FuelPandaSchema.execute(query, variables: variables, context: context, operation_name: operation_name)
-    render json: result
+
+    if current_tenant
+      ActsAsTenant.with_tenant(current_tenant) do
+        result = FuelPandaSchema.execute(query, variables: variables, context: context, operation_name: operation_name)
+        render json: result
+      end
+    else
+      result = FuelPandaSchema.execute(query, variables: variables, context: context, operation_name: operation_name)
+      render json: result
+    end
+
   rescue StandardError => e
     raise e unless Rails.env.development?
     handle_error_in_development(e)
