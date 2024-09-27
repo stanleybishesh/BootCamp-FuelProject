@@ -1,4 +1,6 @@
 class OrderGroup < ApplicationRecord
+  acts_as_tenant(:tenant)
+
   after_initialize :set_default_start_on, if: :new_record?
   before_save :set_default_status, :set_default_completed_on
 
@@ -18,8 +20,6 @@ class OrderGroup < ApplicationRecord
   belongs_to :venue
   accepts_nested_attributes_for :delivery_order
   # belongs_to :tenant
-
-  acts_as_tenant(:tenant)
 
   def recurring_order?
     recurring.present?

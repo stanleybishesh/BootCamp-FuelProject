@@ -118,7 +118,7 @@ module OrderGroups
         user = current_user
         if user
           ActsAsTenant.with_tenant(user.tenant) do
-            @order_group = OrderGroup.find(params[:order_group_id])
+            @order_group = OrderGroup.find_by(id: params[:order_group_id])
             raise ActiveRecord::RecordNotFound, "Order Group not found" if @order_group.nil?
 
             if @order_group.recurring_order?
