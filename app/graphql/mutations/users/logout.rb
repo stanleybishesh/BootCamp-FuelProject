@@ -21,7 +21,7 @@ module Mutations
               errors: [ user_service.errors ]
             }
           end
-        rescue GraphQL::ExecutionError => err
+        rescue StandardError => err
           {
             success: false,
             message: "Log out failed",

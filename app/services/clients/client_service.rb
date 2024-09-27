@@ -46,27 +46,21 @@ module Clients
 
     def handle_create_client
       begin
-        user = current_user
-        if user
-          ActiveRecord::Base.transaction do
-            @client = Client.new(client_params)
-            if @client.save
-              membership = Membership.new(client_id: @client.id)
-              if membership.save
-                @success = true
-                @errors = []
-              else
-                @success = false
-                @errors = [ membership.errors.full_messages ]
-              end
+        ActiveRecord::Base.transaction do
+          @client = Client.new(client_params)
+          if @client.save
+            membership = Membership.new(client_id: @client.id)
+            if membership.save
+              @success = true
+              @errors = []
             else
               @success = false
-              @errors = [ @client.errors.full_messages ]
+              @errors = [ membership.errors.full_messages ]
             end
+          else
+            @success = false
+            @errors = [ @client.errors.full_messages ]
           end
-        else
-          @success = false
-          @errors << "User not logged in"
         end
       rescue ActiveRecord::Rollback => err
         @success = false
@@ -79,27 +73,21 @@ module Clients
 
     def handle_edit_client
       begin
-        user = current_user
-        if user
-          membership = Membership.find_by(client_id: params[:client_id])
-          raise ActiveRecord::RecordNotFound, "Client's membership not found" if membership.nil?
-          @client = Client.find(membership.client_id)
-          if @client
-            updated_client = @client.update(client_params)
-            if updated_client
-              @success = true
-              @errors = []
-            else
-              @success = false
-              @errors = [ @client.errors.full_messages ]
-            end
+        membership = Membership.find_by(client_id: params[:client_id])
+        raise ActiveRecord::RecordNotFound, "Client's membership not found" if membership.nil?
+        @client = Client.find(membership.client_id)
+        if @client
+          updated_client = @client.update(client_params)
+          if updated_client
+            @success = true
+            @errors = []
           else
             @success = false
-            @errors << "Client does not exist in this tenant"
+            @errors = [ @client.errors.full_messages ]
           end
         else
           @success = false
-          @errors << "User not logged in"
+          @errors << "Client does not exist in this tenant"
         end
       rescue ActiveRecord::RecordNotFound => err
         @success = false
@@ -112,26 +100,20 @@ module Clients
 
     def handle_delete_client
       begin
-        user = current_user
-        if user
-          membership = Membership.find_by(client_id: params[:client_id])
-          raise ActiveRecord::RecordNotFound, "Client's membership not found" if membership.nil?
-          @client = Client.find(membership.client_id)
-          if @client
-            if @client.destroy && membership.destroy
-              @success = true
-              @errors = []
-            else
-              @success = false
-              @errors = [ @client.errors.full_messages ]
-            end
+        membership = Membership.find_by(client_id: params[:client_id])
+        raise ActiveRecord::RecordNotFound, "Client's membership not found" if membership.nil?
+        @client = Client.find(membership.client_id)
+        if @client
+          if @client.destroy && membership.destroy
+            @success = true
+            @errors = []
           else
             @success = false
-            @errors << "Client does not exist in this tenant"
+            @errors = [ @client.errors.full_messages ]
           end
         else
           @success = false
-          @errors << "User not logged in"
+          @errors << "Client does not exist in this tenant"
         end
       rescue ActiveRecord::RecordNotDestroyed, ActiveRecord::RecordNotFound => err
         @success = false
@@ -144,16 +126,10 @@ module Clients
 
     def handle_get_all_clients
       begin
-        user = current_user
-        if user
-          memberships = Membership.all
-          @clients = Client.where(id: memberships.select(:client_id))
-          @success = true
-          @errors = []
-        else
-          @success = false
-          @errors << "User not logged in"
-        end
+        memberships = Membership.all
+        @clients = Client.where(id: memberships.select(:client_id))
+        @success = true
+        @errors = []
       rescue StandardError => err
         @success = false
         @errors << "An unexpected error occurred: #{err.message}"
@@ -162,18 +138,12 @@ module Clients
 
     def handle_get_client_by_id
       begin
-        user = current_user
-        if user
-          membership = Membership.find_by(client_id: params[:client_id])
-          raise ActiveRecord::RecordNotFound, "Client's membership not found" if membership.nil?
-          @client = Client.find(membership.client_id)
-          raise ActiveRecord::RecordNotFound, "Client not found" if @client.nil?
-          @success = true
-          @errors = []
-        else
-          @success = false
-          @errors << "User not logged in"
-        end
+        membership = Membership.find_by(client_id: params[:client_id])
+        raise ActiveRecord::RecordNotFound, "Client's membership not found" if membership.nil?
+        @client = Client.find(membership.client_id)
+        raise ActiveRecord::RecordNotFound, "Client not found" if @client.nil?
+        @success = true
+        @errors = []
       rescue ActiveRecord::RecordNotFound => err
         @success = false
         @errors << err.message
@@ -181,10 +151,6 @@ module Clients
         @success = false
         @errors << "An unexpected error occurred: #{err.message}"
       end
-    end
-
-    def current_user
-      params[:current_user]
     end
 
     def client_params

@@ -3,7 +3,7 @@ module Mutations
     class Login < BaseMutation
       argument :login_data, Types::InputObjects::UserLoginInputType, required: true
 
-      field :token, String, null: false
+      field :token, String, null: true
       field :user, Types::Users::UserType, null: true
       field :errors, [ String ], null: true
 
@@ -23,7 +23,7 @@ module Mutations
               errors: [ user_service.errors ]
             }
           end
-        rescue GraphQL::ExecutionError => err
+        rescue StandardError => err
           {
             token: nil,
             user: nil,

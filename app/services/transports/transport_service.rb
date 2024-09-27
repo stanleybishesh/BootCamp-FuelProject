@@ -2,6 +2,7 @@ module Transports
   class TransportService
     attr_reader :params
     attr_accessor :success, :errors, :transport, :transports
+
     def initialize(params = {})
       @params = params
       @success = false
@@ -45,19 +46,13 @@ module Transports
 
     def handle_create_transport
       begin
-        user = current_user
-        if user
-          @transport = Transport.new(transport_params)
-          if @transport.save
-            @success = true
-            @errors = []
-          else
-            @success = false
-            @errors = @transport.errors.full_messages
-          end
+        @transport = Transport.new(transport_params)
+        if @transport.save
+          @success = true
+          @errors = []
         else
           @success = false
-          @errors << "User not logged in"
+          @errors = @transport.errors.full_messages
         end
       rescue StandardError => err
         @success = false
@@ -67,19 +62,13 @@ module Transports
 
     def handle_update_transport
       begin
-        user = current_user
-        if user
-          @transport = Transport.find(params[:transport_id])
-          if @transport.update(transport_params)
-            @success = true
-            @errors = []
-          else
-            @success = false
-            @errors = @transport.errors.full_messages
-          end
+        @transport = Transport.find(params[:transport_id])
+        if @transport.update(transport_params)
+          @success = true
+          @errors = []
         else
           @success = false
-          @errors << "User not logged in"
+          @errors = @transport.errors.full_messages
         end
       rescue StandardError => err
         @success = false
@@ -89,19 +78,13 @@ module Transports
 
     def handle_delete_transport
       begin
-        user = current_user
-        if user
-          @transport = Transport.find(params[:transport_id])
-          if @transport.destroy
-            @success = true
-            @errors = []
-          else
-            @success = false
-            @errors = @transport.errors.full_messages
-          end
+        @transport = Transport.find(params[:transport_id])
+        if @transport.destroy
+          @success = true
+          @errors = []
         else
           @success = false
-          @errors << "User not logged in"
+          @errors = @transport.errors.full_messages
         end
       rescue StandardError => err
         @success = false
@@ -111,15 +94,9 @@ module Transports
 
     def handle_get_all_transport
       begin
-        user = current_user
-        if user
-          @transports = Transport.all
-          @success = true
-          @errors = []
-        else
-          @success = false
-          @errors << "User not logged in"
-        end
+        @transports = Transport.all
+        @success = true
+        @errors = []
       rescue StandardError => err
         @success = false
         @errors << "An unexpected error occurred: #{err.message}"
@@ -128,23 +105,13 @@ module Transports
 
     def handle_get_transports_by_vehicle_type(vehicle_type)
       begin
-        user = current_user
-        if user
-          @transports = Transport.where(vehicle_type: vehicle_type)
-          @success = true
-          @errors = []
-        else
-          @success = false
-          @errors << "User not logged in"
-        end
+        @transports = Transport.where(vehicle_type: vehicle_type)
+        @success = true
+        @errors = []
       rescue StandardError => err
         @success = false
         @errors << "An unexpected error occurred: #{err.message}"
       end
-    end
-
-    def current_user
-      params[:current_user]
     end
 
     def transport_params
