@@ -48,16 +48,14 @@ module Merchandises
       begin
         user = current_user
         if user
-          ActsAsTenant.with_tenant(user.tenant) do
-            merchandise_category = MerchandiseCategory.find(params[:merchandise_category_id])
-            @merchandise = merchandise_category.merchandises.build(merchandise_params)
-            if @merchandise.save
-              @success = true
-              @errors = []
-            else
-              @success = false
-              @errors = @merchandise.errors.full_messages
-            end
+          merchandise_category = MerchandiseCategory.find(params[:merchandise_category_id])
+          @merchandise = merchandise_category.merchandises.build(merchandise_params)
+          if @merchandise.save
+            @success = true
+            @errors = []
+          else
+            @success = false
+            @errors = @merchandise.errors.full_messages
           end
         else
           @success = false
@@ -73,15 +71,13 @@ module Merchandises
       begin
         user = current_user
         if user
-          ActsAsTenant.with_tenant(user.tenant) do
-            @merchandise = Merchandise.find(params[:merchandise_id])
-            if @merchandise.update(merchandise_params)
-              @success = true
-              @errors = []
-            else
-              @success = false
-              @errors = @merchandise.errors.full_messages
-            end
+          @merchandise = Merchandise.find(params[:merchandise_id])
+          if @merchandise.update(merchandise_params)
+            @success = true
+            @errors = []
+          else
+            @success = false
+            @errors = @merchandise.errors.full_messages
           end
         else
             @success = false
@@ -97,15 +93,13 @@ module Merchandises
       begin
         user = current_user
         if user
-          ActsAsTenant.with_tenant(user.tenant) do
-            @merchandise = Merchandise.find(params[:merchandise_id])
-            if @merchandise.destroy
-              @success = true
-              @errors = []
-            else
-              @success = false
-              @errors = @merchandise.errors.full_messages
-            end
+          @merchandise = Merchandise.find(params[:merchandise_id])
+          if @merchandise.destroy
+            @success = true
+            @errors = []
+          else
+            @success = false
+            @errors = @merchandise.errors.full_messages
           end
         else
           @success = false
@@ -121,11 +115,9 @@ module Merchandises
       begin
         user = current_user
         if user
-          ActsAsTenant.with_tenant(user.tenant) do
-            @merchandises = Merchandise.all
-            @success = true
-            @errors = []
-          end
+          @merchandises = Merchandise.all
+          @success = true
+          @errors = []
         else
           @success = false
           @errors << "User not logged in"
@@ -140,12 +132,10 @@ module Merchandises
       begin
         user = current_user
         if user
-          ActsAsTenant.with_tenant(user.tenant) do
-            category = MerchandiseCategory.find(params[:merchandise_category_id])
-            @merchandises = category.merchandises
-            @success = true
-            @errors = []
-          end
+          category = MerchandiseCategory.find(params[:merchandise_category_id])
+          @merchandises = category.merchandises
+          @success = true
+          @errors = []
         else
           @success = false
           @errors << "User not logged in"
