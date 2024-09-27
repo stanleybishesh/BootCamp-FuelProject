@@ -8,21 +8,29 @@ class Mutations::MerchandiseCategories::CreateMerchandiseCategory < Mutations::B
 
   def resolve(name:, description:)
     begin
-      merchandise_category_service = ::MerchandiseCategories::MerchandiseCategoryService.new(name: name, description: description, current_user: current_user).execute_create_merchandise_category
-      if merchandise_category_service.success?
-        {
-          merchandise_category: merchandise_category_service.merchandise_category,
-          message: "Merchandise category created successfully",
-          errors: []
-        }
+      if current_user
+        merchandise_category_service = ::MerchandiseCategories::MerchandiseCategoryService.new(name: name, description: description).execute_create_merchandise_category
+        if merchandise_category_service.success?
+          {
+            merchandise_category: merchandise_category_service.merchandise_category,
+            message: "Merchandise category created successfully",
+            errors: []
+          }
+        else
+          {
+            merchandise_category: nil,
+            message: "Merchandise category failed to create",
+            errors: [ merchandise_category_service.errors ]
+          }
+        end
       else
         {
           merchandise_category: nil,
-          message: "Merchandise category failed to create",
-          errors: [ merchandise_category_service.errors ]
+          message: "You are not authorized to perform this action.",
+          errors: [ "User not logged in" ]
         }
       end
-    rescue GraphQL::ExecutionError => err
+    rescue StandardError => err
       {
         merchandise_category: nil,
         messages: "Merchandise category failed to create",

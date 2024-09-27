@@ -7,19 +7,26 @@ class Mutations::Venues::DeleteVenue < Mutations::BaseMutation
 
   def resolve(client_id:, venue_id:)
     begin
-      venue_service = ::Venues::VenueService.new(client_id: client_id, venue_id: venue_id, current_user: current_user).execute_delete_venue
-      if venue_service.success?
-        {
-          message: "Venue deleted successfully",
-          errors: []
-        }
+      if current_user
+        venue_service = ::Venues::VenueService.new(client_id: client_id, venue_id: venue_id).execute_delete_venue
+        if venue_service.success?
+          {
+            message: "Venue deleted successfully",
+            errors: []
+          }
+        else
+          {
+            message: "Venue failed to delete",
+            errors: [ venue_service.errors ]
+          }
+        end
       else
         {
-          message: "Venue failed to delete",
-          errors: [ venue_service.errors ]
+          message: "You are not authorized to perform this action.",
+          errors: [ "User not logged in" ]
         }
       end
-    rescue GraphQL::ExecutionError => err
+    rescue StandardError => err
       {
         message: "Venue failed to edit",
         errors: [ err.message ]

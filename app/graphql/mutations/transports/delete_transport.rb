@@ -4,20 +4,27 @@ module Mutations
       argument :transport_id, ID, required: true
 
       field :errors, [ String ], null: true
-      field :message, String, null: false
+      field :message, String, null: true
 
       def resolve(transport_id:)
-        transport_service = ::Transports::TransportService.new(transport_id: transport_id, current_user: current_user).execute_delete_transport
-        if transport_service.success?
-          {
-            message: "Transport deleted successfully",
-            errors: []
-          }
-        else
+        if current_user
+          transport_service = ::Transports::TransportService.new(transport_id: transport_id).execute_delete_transport
+          if transport_service.success?
+            {
+              message: "Transport deleted successfully",
+              errors: []
+            }
+          else
             {
               message: "Transport deletion failed",
               errors: [ transport_service.errors ]
             }
+          end
+        else
+          {
+            message: "You are not authorized to perform this action.",
+            errors: [ "User not logged in" ]
+          }
         end
       end
     end

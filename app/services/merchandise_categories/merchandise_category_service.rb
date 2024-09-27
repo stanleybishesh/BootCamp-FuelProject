@@ -46,19 +46,13 @@ module MerchandiseCategories
 
     def handle_create_merchandise_category
       begin
-        user = current_user
-        if user
-          @merchandise_category = MerchandiseCategory.new(merchandise_category_params)
-          if @merchandise_category.save
-            @success = true
-            @errors = []
-          else
-            @success = false
-            @errors = [ @merchandise_category.errors.full_messages ]
-          end
+        @merchandise_category = MerchandiseCategory.new(merchandise_category_params)
+        if @merchandise_category.save
+          @success = true
+          @errors = []
         else
           @success = false
-          @errors << "User not logged in"
+          @errors = [ @merchandise_category.errors.full_messages ]
         end
       rescue StandardError => err
         @success = false
@@ -68,20 +62,13 @@ module MerchandiseCategories
 
     def handle_update_merchandise_category
       begin
-        user = current_user
-        if user
-          @merchandise_category = MerchandiseCategory.find(params[:merchandise_category_id])
-
-          if @merchandise_category.update(merchandise_category_params)
-            @success = true
-            @errors = []
-          else
-            @success = false
-            @errors = @merchandise_category.errors.full_messages
-          end
+        @merchandise_category = MerchandiseCategory.find(params[:merchandise_category_id])
+        if @merchandise_category.update(merchandise_category_params)
+          @success = true
+          @errors = []
         else
           @success = false
-          @errors << "User not logged in"
+          @errors = @merchandise_category.errors.full_messages
         end
       rescue StandardError => err
         @success = false
@@ -92,19 +79,13 @@ module MerchandiseCategories
 
     def handle_delete_merchandise_category
       begin
-        user = current_user
-        if user
-          @merchandise_category = MerchandiseCategory.find(params[:merchandise_category_id])
-          if @merchandise_category.destroy
-            @success = true
-            @errors = []
-          else
-            @success = false
-            @errors = @merchandise_category.errors.full_messages
-          end
+        @merchandise_category = MerchandiseCategory.find(params[:merchandise_category_id])
+        if @merchandise_category.destroy
+          @success = true
+          @errors = []
         else
           @success = false
-          @errors << "User not logged in"
+          @errors = @merchandise_category.errors.full_messages
         end
       rescue StandardError => err
         @success = false
@@ -114,14 +95,9 @@ module MerchandiseCategories
 
     def handle_get_all_merchandise_categories
       begin
-        user = current_user
-        if user
-          @merchandise_categories = MerchandiseCategory.all
-          @success = true
-        else
-          @success = false
-          @errors << "User not logged in"
-        end
+        @merchandise_categories = MerchandiseCategory.all
+        @success = true
+        @errors = []
       rescue StandardError => err
         @success = false
         @errors << "An unexpected error occurred: #{err.message}"
@@ -130,14 +106,9 @@ module MerchandiseCategories
 
     def handle_get_merchandise_category_by_id
       begin
-        user = current_user
-        if user
-          @merchandise_category = MerchandiseCategory.find(params[:merchandise_category_id])
-          @success = true
-        else
-          @success = false
-          @errors << "User not logged in"
-        end
+        @merchandise_category = MerchandiseCategory.find(params[:merchandise_category_id])
+        @success = true
+        @errors = []
       rescue ActiveRecord::RecordNotFound
         @success = false
         @errors << "Merchandise category not found"
@@ -145,10 +116,6 @@ module MerchandiseCategories
         @success = false
         @errors << "An unexpected error occurred: #{err.message}"
       end
-    end
-
-    def current_user
-      params[:current_user]
     end
 
     def merchandise_category_params

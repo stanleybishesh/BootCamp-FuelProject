@@ -5,15 +5,22 @@ module Resolvers
 
       def resolve
         begin
-          transport_service = ::Transports::TransportService.new(current_user: current_user).execute_get_all_transport
-
-          if transport_service.success?
-            transport_service.transports
+          if current_user
+            transport_service = ::Transports::TransportService.new.execute_get_all_transport
+            if transport_service.success?
+              transport_service.transports
+            else
+              raise GraphQL::ExecutionError, transport_service.errors
+            end
           else
-            raise GraphQL::ExecutionError, transport_service.errors
+            raise GraphQL::UnauthorizedError, "User not logged in"
           end
+        rescue GraphQL::UnauthorizedError => err
+          raise err
         rescue GraphQL::ExecutionError => err
-          raise GraphQL::ExecutionError, err.message
+          raise err
+        rescue StandardError => err
+          raise GraphQL::ExecutionError, "An unexpected error occurred: #{err.message}"
         end
       end
     end
