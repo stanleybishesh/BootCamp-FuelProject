@@ -1,5 +1,5 @@
 class Resolvers::MerchandiseCategories::GetAllMerchandiseCategories < Resolvers::BaseResolver
-  type [ Types::MerchandiseCategories::MerchandiseCategoryType ], null: treu
+  type [ Types::MerchandiseCategories::MerchandiseCategoryType ], null: true
 
   def resolve
     begin
