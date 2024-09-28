@@ -48,18 +48,11 @@ class OrderGroup < ApplicationRecord
   end
 
   def set_default_status
-    if self.status != "delivered" && self.status != "cancelled"
-      if delivery_order&.courier_id.nil?
-        self.status = "pending"
-      else
-        self.status = "processing"
-      end
-    end
+    return if delivered? || cancelled?
+    self.status = delivery_order&.courier_id.nil? ? "pending" : "processing"
   end
 
   def set_default_completed_on
-    if status_changed? && status == "delivered"
-      self.completed_on = DateTime.current
-    end
+    self.completed_on = DateTime.current if status_changed? && delivered?
   end
 end
