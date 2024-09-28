@@ -1,4 +1,6 @@
 class DeliveryOrder < ApplicationRecord
+  acts_as_tenant(:tenant)
+
   after_save :touch_order_group
 
   belongs_to :order_group

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_09_25_154014) do
+ActiveRecord::Schema[7.2].define(version: 2024_09_28_172220) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -49,8 +49,10 @@ ActiveRecord::Schema[7.2].define(version: 2024_09_25_154014) do
     t.string "vehicle_type"
     t.integer "transport_id"
     t.integer "courier_id"
+    t.integer "tenant_id"
     t.index ["courier_id"], name: "index_delivery_orders_on_courier_id"
     t.index ["order_group_id"], name: "index_delivery_orders_on_order_group_id"
+    t.index ["tenant_id"], name: "index_delivery_orders_on_tenant_id"
     t.index ["transport_id"], name: "index_delivery_orders_on_transport_id"
   end
 
@@ -64,9 +66,11 @@ ActiveRecord::Schema[7.2].define(version: 2024_09_25_154014) do
     t.integer "merchandise_category_id"
     t.float "price"
     t.string "unit"
+    t.integer "tenant_id"
     t.index ["delivery_order_id"], name: "index_line_items_on_delivery_order_id"
     t.index ["merchandise_category_id"], name: "index_line_items_on_merchandise_category_id"
     t.index ["merchandise_id"], name: "index_line_items_on_merchandise_id"
+    t.index ["tenant_id"], name: "index_line_items_on_tenant_id"
     t.index ["transport_id"], name: "index_line_items_on_transport_id"
   end
 
