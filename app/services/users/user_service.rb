@@ -33,19 +33,17 @@ module Users
       begin
         @user = User.find_by(email: params[:email])
         if @user
-          ActsAsTenant.with_tenant(@user.tenant) do
-            if @user&.valid_password?(params[:password])
-              jti = SecureRandom.uuid
-              @token = ::JWT.encode({ user_id: @user.id, jti: jti, exp: 1.day.from_now.to_i, type: "user" }, "secret", "HS256")
+          if @user&.valid_password?(params[:password])
+            jti = SecureRandom.uuid
+            @token = ::JWT.encode({ user_id: @user.id, jti: jti, exp: 1.day.from_now.to_i, type: "user" }, "secret", "HS256")
 
-              # Optionally, store the JTI in the database or a cache with an expiration time
-              @user.update(jti: jti)
-              @success = true
-              @errors = []
-            else
-              @success = false
-              @errors = [ @user.errors.full_messages ]
-            end
+            # Optionally, store the JTI in the database or a cache with an expiration time
+            @user.update(jti: jti)
+            @success = true
+            @errors = []
+          else
+            @success = false
+            @errors = [ @user.errors.full_messages ]
           end
         else
           @success = false
@@ -61,12 +59,10 @@ module Users
       begin
         @user = current_user
         if @user
-          ActsAsTenant.with_tenant(@user.tenant) do
-            new_jti = SecureRandom.uuid
-            @user.update(jti: new_jti)
-            @success = true
-            @errors=[]
-          end
+          new_jti = SecureRandom.uuid
+          @user.update(jti: new_jti)
+          @success = true
+          @errors=[]
         else
           @success = false
           @errors << "User not logged in"

@@ -3,7 +3,7 @@ module Mutations
     class CourierSignin < BaseMutation
       argument :login_data, Types::InputObjects::CourierLoginInputType, required: true
 
-      field :token, String, null: false
+      field :token, String, null: true
       field :courier, Types::Couriers::CourierType, null: true
       field :message, String, null: true
       field :errors, [ String ], null: true

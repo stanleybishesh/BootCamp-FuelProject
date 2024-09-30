@@ -41,24 +41,16 @@ module Venues
 
     def handle_create_venue
       begin
-        user = current_user
-        if user
-          ActsAsTenant.with_tenant(user.tenant) do
-            membership = Membership.find_by(client_id: params[:client_id])
-            raise ActiveRecord::RecordNotFound, "Client not found in this tenant" if membership.nil?
-            client = Client.find(membership.client_id)
-            @venue = client.venues.build(venue_params)
-            if @venue.save
-              @success = true
-              @errors = []
-            else
-              @success = false
-              @errors = [ @venue.errors.full_messages ]
-            end
-          end
+        membership = Membership.find_by(client_id: params[:client_id])
+        raise ActiveRecord::RecordNotFound, "Client not found in this tenant" if membership.nil?
+        client = Client.find(membership.client_id)
+        @venue = client.venues.build(venue_params)
+        if @venue.save
+          @success = true
+          @errors = []
         else
           @success = false
-          @errors << "User not logged in"
+          @errors = [ @venue.errors.full_messages ]
         end
       rescue ActiveRecord::RecordNotFound => err
         @success = false
@@ -71,24 +63,16 @@ module Venues
 
     def handle_edit_venue
       begin
-        user = current_user
-        if user
-          ActsAsTenant.with_tenant(user.tenant) do
-            membership = Membership.find_by(client_id: params[:client_id])
-            raise ActiveRecord::RecordNotFound, "Client not found in this tenant" if membership.nil?
-            client = Client.find(membership.client_id)
-            @venue = client.venues.find(params[:venue_id])
-            if @venue.update(venue_params)
-              @success = true
-              @errors = []
-            else
-              @success = false
-              @errors = [ @venue.errors.full_messages ]
-            end
-          end
+        membership = Membership.find_by(client_id: params[:client_id])
+        raise ActiveRecord::RecordNotFound, "Client not found in this tenant" if membership.nil?
+        client = Client.find(membership.client_id)
+        @venue = client.venues.find(params[:venue_id])
+        if @venue.update(venue_params)
+          @success = true
+          @errors = []
         else
           @success = false
-          @errors << "User not logged in"
+          @errors = [ @venue.errors.full_messages ]
         end
       rescue ActiveRecord::RecordNotFound => err
         @success = false
@@ -101,24 +85,16 @@ module Venues
 
     def handle_delete_venue
       begin
-        user = current_user
-        if user
-          ActsAsTenant.with_tenant(user.tenant) do
-            membership = Membership.find_by(client_id: params[:client_id])
-            raise ActiveRecord::RecordNotFound, "Client not found in this tenant" if membership.nil?
-            client = Client.find(membership.client_id)
-            @venue = client.venues.find(params[:venue_id])
-            if @venue.destroy
-              @success = true
-              @errors = []
-            else
-              @success = false
-              @errors = [ @venue.errors.full_messages ]
-            end
-          end
+        membership = Membership.find_by(client_id: params[:client_id])
+        raise ActiveRecord::RecordNotFound, "Client not found in this tenant" if membership.nil?
+        client = Client.find(membership.client_id)
+        @venue = client.venues.find(params[:venue_id])
+        if @venue.destroy
+          @success = true
+          @errors = []
         else
           @success = false
-          @errors << "User not logged in"
+          @errors = [ @venue.errors.full_messages ]
         end
       rescue ActiveRecord::RecordNotFound, ActiveRecord::RecordNotDestroyed => err
         @success = false
@@ -131,20 +107,12 @@ module Venues
 
     def handle_get_venues_by_client_id
       begin
-        user = current_user
-        if user
-          ActsAsTenant.with_tenant(user.tenant) do
-            membership = Membership.find_by(client_id: params[:client_id])
-            raise ActiveRecord::RecordNotFound, "Client not found in this tenant" if membership.nil?
-            client = Client.find(membership.client_id)
-            @venues = client.venues
-            @success = true
-            @errors = []
-          end
-        else
-          @success = false
-          @errors << "User not logged in"
-        end
+        membership = Membership.find_by(client_id: params[:client_id])
+        raise ActiveRecord::RecordNotFound, "Client not found in this tenant" if membership.nil?
+        client = Client.find(membership.client_id)
+        @venues = client.venues
+        @success = true
+        @errors = []
       rescue ActiveRecord::RecordNotFound => err
         @success = false
         @errors << err.message
@@ -152,10 +120,6 @@ module Venues
         @success = false
         @errors << "An unexpected error occurred: #{err.message}"
       end
-    end
-
-    def current_user
-      params[:current_user]
     end
 
     def venue_params

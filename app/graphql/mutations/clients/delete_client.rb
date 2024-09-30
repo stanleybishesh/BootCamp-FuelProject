@@ -6,19 +6,26 @@ class Mutations::Clients::DeleteClient < Mutations::BaseMutation
 
   def resolve(client_id:)
     begin
-      client_service = ::Clients::ClientService.new(current_user: current_user, client_id: client_id).execute_delete_client
-      if client_service.success?
-        {
-          message: "Client deleted successfully",
-          errors: []
-        }
+      if current_user
+        client_service = ::Clients::ClientService.new(client_id: client_id).execute_delete_client
+        if client_service.success?
+          {
+            message: "Client deleted successfully",
+            errors: []
+          }
+        else
+          {
+            message: "Client failed to delete",
+            errors: [ client_service.errors ]
+          }
+        end
       else
         {
-          message: "Client failed to delete",
-          errors: [ client_service.errors ]
+          message: "You are unauthorized to perform this action.",
+          errors: [ "User not logged in" ]
         }
       end
-    rescue GraphQL::ExecutionError => err
+    rescue StandardError => err
       {
         message: "Client failed to delete",
         errors: [ err.message ]

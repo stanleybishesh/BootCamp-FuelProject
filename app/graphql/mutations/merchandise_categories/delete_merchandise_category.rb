@@ -6,23 +6,29 @@ class Mutations::MerchandiseCategories::DeleteMerchandiseCategory < Mutations::B
 
   def resolve(merchandise_category_id:)
     begin
-      merchandise_category_service = ::MerchandiseCategories::MerchandiseCategoryService.new(
-        merchandise_category_id: merchandise_category_id,
-        current_user: current_user
-      ).execute_delete_merchandise_category
+      if current_user
+        merchandise_category_service = ::MerchandiseCategories::MerchandiseCategoryService.new(
+          merchandise_category_id: merchandise_category_id,
+        ).execute_delete_merchandise_category
 
-      if merchandise_category_service.success?
-        {
-          message: "Merchandise category deleted successfully",
-          errors: []
-        }
+        if merchandise_category_service.success?
+          {
+            message: "Merchandise category deleted successfully",
+            errors: []
+          }
+        else
+          {
+            message: "Failed to delete merchandise category",
+            errors: [ merchandise_category_service.errors ]
+          }
+        end
       else
         {
-          message: "Failed to delete merchandise category",
-          errors: [ merchandise_category_service.errors ]
+          message: "You are not authorized to perform this action.",
+          errors: [ "User not logged in" ]
         }
       end
-    rescue GraphQL::ExecutionError => err
+    rescue StandardError => err
       {
         message: "Failed to delete merchandise category",
         errors: [ err.message ]

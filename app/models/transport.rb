@@ -1,6 +1,6 @@
 class Transport < ApplicationRecord
   # belongs_to :tenant
-  has_many :line_items
+  has_many :delivery_orders
 
   enum status: {
     available: "available",

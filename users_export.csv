@@ -1,11 +1,4 @@
 id,email,name,tenant_id,created_at,updated_at,jti
-10,bipin@gmail.com,bipin,1,2024-09-05 07:14:03 UTC,2024-09-20 05:10:57 UTC,2e32b82b-a323-44fc-8b14-16dc4ef1ae63
-11,tipin@gmail.com,tipin,2,2024-09-05 07:15:05 UTC,2024-09-20 05:10:57 UTC,5eaae76d-cccd-4d7b-b89b-654835c736d5
-12,lol@gmail.com,lol,1,2024-09-20 06:49:34 UTC,2024-09-20 06:49:34 UTC,3ae2c248-a5b0-4730-b5e9-6862f6c4e263
-13,golu@gmail.com,golu,2,2024-09-20 06:49:34 UTC,2024-09-20 06:49:34 UTC,d10ee8a8-9039-454d-921b-4185f3db4b4c
-14,patlu@gmail.com,patlu,3,2024-09-20 06:49:35 UTC,2024-09-20 06:49:35 UTC,76aba7ba-cbce-4777-a6c7-2a26499c32b1
-16,mol@gmail.com,mol,1,2024-09-20 07:21:12 UTC,2024-09-20 07:22:57 UTC,2e32b82b-a323-44dfdfc-8b14-16dc4ef1ae63
-17,solu@gmail.com,solu,2,2024-09-20 07:21:12 UTC,2024-09-20 07:22:57 UTC,5eaae76d-cccd-4d7db-b89b-654835c736d5
-15,motu@gmail.com,motu,3,2024-09-20 07:19:15 UTC,2024-09-20 07:22:58 UTC,5eaae76d-cccd-4d7fsb-b89b-654835c736d5
-18,motsu@gmail.com,motu,3,2024-09-20 07:22:58 UTC,2024-09-20 07:22:58 UTC,c3ff1c65-a278-4803-a663-516090f55f6a
-19,user@example.com,John Doe,2,2024-09-20 11:34:18 UTC,2024-09-23 04:42:19 UTC,a6a3123b-bb30-47f6-8c1d-cecc01722929
+3,bipin@gmail.com,Bipin Thapaa,1,2024-09-25 14:58:30 UTC,2024-09-25 14:58:30 UTC,0facc7f4-481e-4ec7-b2ad-f2fdaef3f689
+2,priya@gmail.com,Priya Kushawaha,1,2024-09-25 14:58:16 UTC,2024-09-26 04:13:38 UTC,574c4b19-e962-4cbe-b32a-e9b8d05654e6
+1,bishesh@gmail.com,Bishesh Ganesh Shrestha,1,2024-09-25 14:57:50 UTC,2024-09-26 04:40:24 UTC,52ebf801-6662-4d75-8636-34d343e4fae2

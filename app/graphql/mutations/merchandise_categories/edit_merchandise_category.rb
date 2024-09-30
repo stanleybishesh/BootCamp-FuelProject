@@ -9,27 +9,34 @@ class Mutations::MerchandiseCategories::EditMerchandiseCategory < Mutations::Bas
 
   def resolve(merchandise_category_id:, name:, description:)
     begin
-      merchandise_category_service = ::MerchandiseCategories::MerchandiseCategoryService.new(
-        name: name,
-        description: description,
-        merchandise_category_id: merchandise_category_id,
-        current_user: current_user
-      ).execute_update_merchandise_category
+      if current_user
+        merchandise_category_service = ::MerchandiseCategories::MerchandiseCategoryService.new(
+          name: name,
+          description: description,
+          merchandise_category_id: merchandise_category_id,
+        ).execute_update_merchandise_category
 
-      if merchandise_category_service.success?
-        {
-          merchandise_category: merchandise_category_service.merchandise_category,
-          message: "Merchandise category updated successfully",
-          errors: []
-        }
+        if merchandise_category_service.success?
+          {
+            merchandise_category: merchandise_category_service.merchandise_category,
+            message: "Merchandise category updated successfully",
+            errors: []
+          }
+        else
+          {
+            merchandise_category: nil,
+            message: "Merchandise category failed to update",
+            errors: [ merchandise_category_service.errors ]
+          }
+        end
       else
         {
           merchandise_category: nil,
-          message: "Merchandise category failed to update",
-          errors: merchandise_category_service.errors.split(". ")
+          message: "You are not authorized to perform this action.",
+          errors: [ "User not logged in" ]
         }
       end
-    rescue GraphQL::ExecutionError => err
+    rescue StandardError => err
       {
         merchandise_category: nil,
         message: "Merchandise category failed to update",

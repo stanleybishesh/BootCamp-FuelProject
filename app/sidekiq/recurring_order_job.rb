@@ -10,7 +10,7 @@ class RecurringOrderJob
         start_date = Date.parse(order_group.recurring["start_date"])
         end_date = Date.parse(order_group.recurring["end_date"])
 
-        create_future_order_groups(order_group, frequency, start_date, end_date)
+        create_children_order_groups(order_group, frequency, start_date, end_date)
       end
     rescue StandardError => e
       Rails.logger.error "RecurringOrderJob failed: #{e.message}"
@@ -19,7 +19,7 @@ class RecurringOrderJob
 
   private
 
-  def create_future_order_groups(order_group, frequency, start_date, end_date)
+  def create_children_order_groups(order_group, frequency, start_date, end_date)
     current_date = start_date
     created_orders = []
 
@@ -50,7 +50,7 @@ class RecurringOrderJob
       current_date = get_next_date(current_date, frequency)
     end
 
-    puts "Created #{created_orders.size} future order groups"
+    puts "Created #{created_orders.size} children order groups"
   end
 
   def get_next_date(current_date, frequency)

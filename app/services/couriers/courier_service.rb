@@ -33,18 +33,15 @@ module Couriers
       begin
         @courier = Courier.find_by(email: params[:email])
         if @courier
-          ActsAsTenant.with_tenant(@courier.tenant) do
-            if @courier&.valid_password?(params[:password])
-              jti = SecureRandom.uuid
-              @token = ::JWT.encode({ courier_id: @courier.id, jti: jti, exp: 1.day.from_now.to_i, type: "courier" }, "secret", "HS256")
-
-              @courier.update(jti: jti)
-              @success = true
-              @errors = []
-            else
-              @success = false
-              @errors << "Invalid Email or Password"
-            end
+          if @courier&.valid_password?(params[:password])
+            jti = SecureRandom.uuid
+            @token = ::JWT.encode({ courier_id: @courier.id, jti: jti, exp: 1.day.from_now.to_i, type: "courier" }, "secret", "HS256")
+            @courier.update(jti: jti)
+            @success = true
+            @errors = []
+          else
+            @success = false
+            @errors << "Invalid Email or Password"
           end
         else
           @success = false
@@ -60,12 +57,10 @@ module Couriers
       begin
         @courier = current_courier
         if @courier
-          ActsAsTenant.with_tenant(@courier.tenant) do
-            new_jti = SecureRandom.uuid
-            @courier.update(jti: new_jti)
-            @success = true
-            @errors = []
-          end
+          new_jti = SecureRandom.uuid
+          @courier.update(jti: new_jti)
+          @success = true
+          @errors = []
         else
           @success = false
           @errors << "Courier not logged in"

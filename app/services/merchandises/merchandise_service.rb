@@ -46,22 +46,14 @@ module Merchandises
 
     def handle_create_merchandise
       begin
-        user = current_user
-        if user
-          ActsAsTenant.with_tenant(user.tenant) do
-            merchandise_category = MerchandiseCategory.find(params[:merchandise_category_id])
-            @merchandise = merchandise_category.merchandises.build(merchandise_params)
-            if @merchandise.save
-              @success = true
-              @errors = []
-            else
-              @success = false
-              @errors = @merchandise.errors.full_messages
-            end
-          end
+        merchandise_category = MerchandiseCategory.find(params[:merchandise_category_id])
+        @merchandise = merchandise_category.merchandises.build(merchandise_params)
+        if @merchandise.save
+          @success = true
+          @errors = []
         else
           @success = false
-          @errors << "User not logged in"
+          @errors = @merchandise.errors.full_messages
         end
       rescue StandardError => err
         @success = false
@@ -71,21 +63,13 @@ module Merchandises
 
     def handle_update_merchandise
       begin
-        user = current_user
-        if user
-          ActsAsTenant.with_tenant(user.tenant) do
-            @merchandise = Merchandise.find(params[:merchandise_id])
-            if @merchandise.update(merchandise_params)
-              @success = true
-              @errors = []
-            else
-              @success = false
-              @errors = @merchandise.errors.full_messages
-            end
-          end
+        @merchandise = Merchandise.find(params[:merchandise_id])
+        if @merchandise.update(merchandise_params)
+          @success = true
+          @errors = []
         else
-            @success = false
-            @errors << "User not logged in"
+          @success = false
+          @errors = @merchandise.errors.full_messages
         end
       rescue StandardError => err
         @success = false
@@ -95,21 +79,13 @@ module Merchandises
 
     def handle_delete_merchandise
       begin
-        user = current_user
-        if user
-          ActsAsTenant.with_tenant(user.tenant) do
-            @merchandise = Merchandise.find(params[:merchandise_id])
-            if @merchandise.destroy
-              @success = true
-              @errors = []
-            else
-              @success = false
-              @errors = @merchandise.errors.full_messages
-            end
-          end
+        @merchandise = Merchandise.find(params[:merchandise_id])
+        if @merchandise.destroy
+          @success = true
+          @errors = []
         else
           @success = false
-          @errors << "User not logged in"
+          @errors = @merchandise.errors.full_messages
         end
       rescue StandardError => err
         @success = false
@@ -119,17 +95,9 @@ module Merchandises
 
     def handle_get_all_merchandises
       begin
-        user = current_user
-        if user
-          ActsAsTenant.with_tenant(user.tenant) do
-            @merchandises = Merchandise.all
-            @success = true
-            @errors = []
-          end
-        else
-          @success = false
-          @errors << "User not logged in"
-        end
+        @merchandises = Merchandise.all
+        @success = true
+        @errors = []
       rescue StandardError => err
         @success = false
         @errors << "An unexpected error occurred: #{err.message}"
@@ -138,26 +106,14 @@ module Merchandises
 
     def handle_get_merchandises_by_category
       begin
-        user = current_user
-        if user
-          ActsAsTenant.with_tenant(user.tenant) do
-            category = MerchandiseCategory.find(params[:merchandise_category_id])
-            @merchandises = category.merchandises
-            @success = true
-            @errors = []
-          end
-        else
-          @success = false
-          @errors << "User not logged in"
-        end
+        category = MerchandiseCategory.find(params[:merchandise_category_id])
+        @merchandises = category.merchandises
+        @success = true
+        @errors = []
       rescue StandardError => err
         @success = false
         @errors << "An unexpected error occurred: #{err.message}"
       end
-    end
-
-    def current_user
-      params[:current_user]
     end
 
     def merchandise_params
