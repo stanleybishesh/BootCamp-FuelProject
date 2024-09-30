@@ -110,11 +110,13 @@ module OrderGroups
         @order_group = OrderGroup.find_by(id: params[:order_group_id])
         raise ActiveRecord::RecordNotFound, "Order Group not found" if @order_group.nil?
 
+        raise ActiveRecord::RecordInvalid, "Delivered order can't be edited" if @order_group.delivered?
+
         if @order_group.recurring_order?
           if @order_group.main_order_group_id.nil?
             @order_group.children_order_groups.each do |child_order|
               unless @order_group.child_order_updated?(child_order)
-                child_order.update(order_group_params)
+                child_order.update(order_group_params) unless child_order.delivered?
               end
               @order_group.update(order_group_params)
               @success = true
@@ -152,10 +154,14 @@ module OrderGroups
       begin
         @order_group = OrderGroup.find_by(id: params[:order_group_id])
         raise ActiveRecord::RecordNotFound, "Order Group not found" if @order_group.nil?
+
+        raise ActiveRecord::RecordNotDestroyed, "Delivered order can't be deleted." if @order_group.delivered?
+
         if @order_group.recurring_order?
           if @order_group.main_order_group_id.nil?
             @order_group.children_order_groups.each do |child_order|
-              child_order.destroy
+              child_order.destroy unless child_order.delivered?
+              @errors << "Error: #{child_order.errors.full_messages}" if !child_order.destroyed?
             end
           end
         end
