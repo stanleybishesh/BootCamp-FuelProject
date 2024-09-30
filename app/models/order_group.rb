@@ -14,7 +14,7 @@ class OrderGroup < ApplicationRecord
   }
 
   has_one :delivery_order, dependent: :destroy
-  has_many :children_order_groups, class_name: "OrderGroup", foreign_key: "main_order_group_id"
+  has_many :children_order_groups, class_name: "OrderGroup", foreign_key: "main_order_group_id", dependent: :nullify
   belongs_to :main_order_group, class_name: "OrderGroup", optional: true
   belongs_to :client
   belongs_to :venue
