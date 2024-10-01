@@ -111,6 +111,9 @@ module Clients
             @success = false
             @errors = [ @client.errors.full_messages ]
           end
+          @client.order_groups.each do |order_group|
+            order_group.destroy unless order_group.delivered?
+          end
         else
           @success = false
           @errors << "Client does not exist in this tenant"

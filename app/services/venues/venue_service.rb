@@ -96,6 +96,9 @@ module Venues
           @success = false
           @errors = [ @venue.errors.full_messages ]
         end
+        @venue.order_groups.each do |order_group|
+          order_group.destroy unless order_group.delivered?
+        end
       rescue ActiveRecord::RecordNotFound, ActiveRecord::RecordNotDestroyed => err
         @success = false
         @errors << err.message
