@@ -27,5 +27,8 @@ module Types
     field :delete_order_group, mutation: Mutations::OrderGroups::DeleteOrderGroup
     field :change_status_to_delivered, mutation: Mutations::OrderGroups::ChangeStatusToDelivered
     field :change_status_to_cancelled, mutation: Mutations::OrderGroups::ChangeStatusToCancelled
+
+    # Test_with_Rspec
+    # field :create_client_spec, mutation: Mutations::Clients::Rspec
   end
 end

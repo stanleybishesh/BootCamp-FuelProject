@@ -43,6 +43,9 @@ group :development, :test do
 
   # Omakase Ruby styling [https://github.com/rails/rubocop-rails-omakase/]
   gem "rubocop-rails-omakase", require: false
+
+  gem "rspec-rails", "~> 7.0", ">= 7.0.1"
+  gem "factory_bot_rails"
 end
 
 group :development do
@@ -69,7 +72,6 @@ gem "acts_as_tenant", "~> 1.0", ">= 1.0.1"
 gem "request_store", "~> 1.7"
 gem "sidekiq", "~> 7.3", ">= 7.3.2"
 gem "sidekiq-scheduler", "~> 5.0", ">= 5.0.6"
-gem "rspec-rails", "~> 7.0", ">= 7.0.1"
 gem "dotenv", "~> 3.1"
 gem "csv"
 gem "nullify", "~> 0.3.0"
