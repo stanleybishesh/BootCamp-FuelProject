@@ -126,6 +126,11 @@ GEM
     erubi (1.13.0)
     et-orbi (1.2.11)
       tzinfo
+    factory_bot (6.5.0)
+      activesupport (>= 5.0.0)
+    factory_bot_rails (6.4.3)
+      factory_bot (~> 6.4)
+      railties (>= 5.0.0)
     fiber-storage (1.0.0)
     fugit (1.11.1)
       et-orbi (~> 1, >= 1.2.11)
@@ -394,6 +399,7 @@ DEPENDENCIES
   devise (~> 4.9, >= 4.9.4)
   devise-jwt (~> 0.12.1)
   dotenv (~> 3.1)
+  factory_bot_rails
   graphiql-rails
   graphql (~> 2.3, >= 2.3.14)
   importmap-rails

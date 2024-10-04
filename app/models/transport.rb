@@ -1,6 +1,6 @@
 class Transport < ApplicationRecord
   # belongs_to :tenant
-  has_many :delivery_orders
+  has_many :delivery_orders, dependent: :destroy
 
   enum status: {
     available: "available",

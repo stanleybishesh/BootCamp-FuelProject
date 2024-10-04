@@ -36,5 +36,8 @@ module FuelPanda
     # This also configures session_options for use below
     config.middleware.use ActionDispatch::Cookies
     config.middleware.use ActionDispatch::Session::CookieStore
+
+    # config.eager_load_paths << Rails.root.join("app/graphql")
+    config.autoload_paths += %W[#{config.root}/app/graphql]
   end
 end
